@@ -1,12 +1,13 @@
-services:
+version: '3.8'
 
+services:
   db:
     image: postgres:latest
     container_name: OdontoGate_DB
     environment:
-      POSTGRES_USER: Administrador
-      POSTGRES_PASSWORD: 12345
-      POSTGRES_DB: OdontoGate_DB
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -14,7 +15,7 @@ services:
     networks:
       - odontogate-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U Administrador -d OdontoGate_DB"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 15s
       timeout: 10s
       retries: 10
@@ -28,13 +29,15 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/OdontoGate_DB
-      SPRING_DATASOURCE_USERNAME: Administrador
-      SPRING_DATASOURCE_PASSWORD: 12345
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
       db:
         condition: service_healthy
+    # Reinicio automático por si Spring arranca antes de que PG esté listo
+    restart: on-failure
     networks:
       - odontogate-network
 
