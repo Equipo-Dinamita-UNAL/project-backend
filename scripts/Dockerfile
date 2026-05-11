@@ -7,15 +7,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends unzip \
 
 COPY demo.zip .
 
-# Descomprimir y compilar apuntando al pom.xml correcto
+# Descomprimir y compilar — el ZIP extrae directo en /app sin subcarpeta
 RUN unzip demo.zip
-RUN mvn -f /app/demo/pom.xml install -DskipTests
+RUN mvn -f /app/pom.xml install -DskipTests
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Copiar desde la ruta correcta donde Maven genera el JAR
-COPY --from=build /app/demo/target/*.jar app.jar
+# El JAR queda en /app/target/ porque el pom.xml está en la raíz
+COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
