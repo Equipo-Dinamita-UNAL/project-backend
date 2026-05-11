@@ -1,17 +1,17 @@
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 RUN apt-get update && apt-get install -y curl unzip
-RUN curl https://start.spring.io/starter.zip \
-    -d type=maven-project \
-    -d language=java \
-    -d bootVersion=3.3.0 \
-    -d javaVersion=21 \
-    -d artifactId=odontogate \
-    -d groupId=com.odontogate \
-    -d packaging=jar \
-    -d dependencies=web,data-jpa,validation,lombok \
-    -o demo.zip && \
-    unzip demo.zip
+RUN curl -L "https://start.spring.io/starter.zip\
+?type=maven-project\
+&language=java\
+&bootVersion=3.3.0\
+&javaVersion=21\
+&artifactId=odontogate\
+&groupId=com.odontogate\
+&packaging=jar\
+&dependencies=web,data-jpa,validation,lombok" \
+    -o demo.zip && unzip demo.zip
+
 RUN mvn install -DskipTests
 
 FROM eclipse-temurin:21-jre
