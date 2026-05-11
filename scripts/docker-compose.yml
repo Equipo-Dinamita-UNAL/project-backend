@@ -1,0 +1,45 @@
+services:
+
+  db:
+    image: postgres:latest
+    container_name: OdontoGate_DB
+    environment:
+      POSTGRES_USER: Administrador
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: OdontoGate_DB
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - odontogate-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U Administrador -d OdontoGate_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: OdontoGate_App
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/OdontoGate_DB
+      SPRING_DATASOURCE_USERNAME: Administrador
+      SPRING_DATASOURCE_PASSWORD: 12345
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - odontogate-network
+
+volumes:
+  postgres_data:
+
+networks:
+  odontogate-network:
+    driver: bridge
