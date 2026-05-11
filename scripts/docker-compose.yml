@@ -15,9 +15,10 @@ services:
       - odontogate-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U Administrador -d OdontoGate_DB"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
 
   app:
     build:
