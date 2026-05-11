@@ -1,5 +1,7 @@
+
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
+RUN apt-get update && apt-get install -y unzip
 COPY demo.zip .
 RUN unzip demo.zip
 RUN mvn install -DskipTests
