@@ -5,12 +5,6 @@ echo "============================================"
 echo " Instalador Odontogate para Linux"
 echo "============================================"
 
-# 0. Verificar que se ejecuta como root
-if [ "$EUID" -ne 0 ]; then
-  echo "ERROR: Este script debe ejecutarse como root."
-  echo "Intenta de nuevo con: sudo bash startup.sh"
-  exit 1
-fi
 
 # 1. Instalar git y curl (con update previo)
 echo "Instalando dependencias base..."
