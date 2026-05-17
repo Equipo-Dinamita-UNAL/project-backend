@@ -17,7 +17,7 @@ REM ─────────────────────────�
 REM BLOQUE 3: Levantar base de datos con Docker
 REM ─────────────────────────────────────────
 echo Levantando base de datos PostgreSQL...
-docker compose -f docker-compose-v2.yml up -d
+docker compose up -d
 
 echo Esperando a que la base de datos este lista...
 timeout /t 10 /nobreak
