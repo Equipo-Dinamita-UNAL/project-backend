@@ -1,4 +1,4 @@
-package com.OdontoGate.Citas.repository;
+package com.OdontoGate.repository;
 
 import com.OdontoGate.Citas.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;

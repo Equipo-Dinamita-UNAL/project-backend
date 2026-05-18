@@ -1,4 +1,4 @@
-package com.OdontoGate.Citas.controller;
+package com.OdontoGate.controller;
 
 import com.OdontoGate.Citas.model.User;
 import com.OdontoGate.Citas.service.UserService;

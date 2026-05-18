@@ -1,4 +1,4 @@
-package com.OdontoGate.Citas;
+package com.OdontoGate;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

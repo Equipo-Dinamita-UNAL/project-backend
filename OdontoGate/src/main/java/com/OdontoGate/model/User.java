@@ -1,4 +1,4 @@
-package com.OdontoGate.Citas.model;
+package com.OdontoGate.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
