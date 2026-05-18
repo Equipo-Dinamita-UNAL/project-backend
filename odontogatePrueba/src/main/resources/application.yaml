@@ -1,6 +1,6 @@
 spring:
   datasource:
-      url: jdbc:postgresql://localhost:5432/odontogate_db
+      url: jdbc:postgresql://localhost:5432/OdontoGate_DB
       username: Administrador
       password: 12345
       driver-class-name: org.postgresql.Driver
