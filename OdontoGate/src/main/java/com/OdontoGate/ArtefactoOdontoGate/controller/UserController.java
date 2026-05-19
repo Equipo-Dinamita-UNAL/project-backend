@@ -1,7 +1,7 @@
-package com.OdontoGate.controller;
+package com.OdontoGate.ArtefactoOdontoGate.controller;
 
-import com.OdontoGate.Citas.model.User;
-import com.OdontoGate.Citas.service.UserService;
+import com.OdontoGate.ArtefactoOdontoGate.model.User;
+import com.OdontoGate.ArtefactoOdontoGate.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

@@ -1,7 +1,7 @@
-package com.OdontoGate.Citas.service;
+package com.OdontoGate.ArtefactoOdontoGate.service;
 
-import com.OdontoGate.Citas.model.User;
-import com.OdontoGate.Citas.repository.UserRepository;
+import com.OdontoGate.ArtefactoOdontoGate.model.User;
+import com.OdontoGate.ArtefactoOdontoGate.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 

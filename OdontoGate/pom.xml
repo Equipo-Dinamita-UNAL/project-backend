@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.OdontoGate</groupId>
-	<artifactId>Citas</artifactId>
+	<artifactId>ArefactoOdontoGate</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name/>
 	<description/>

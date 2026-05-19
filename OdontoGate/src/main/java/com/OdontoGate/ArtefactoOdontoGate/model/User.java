@@ -1,4 +1,4 @@
-package com.OdontoGate.model;
+package com.OdontoGate.ArtefactoOdontoGate.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -16,7 +16,7 @@ public class User {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "lasntame")
+    @Column(name = "lastame")
     private String lastname;
 
     @Column(name = "email", unique = true)
