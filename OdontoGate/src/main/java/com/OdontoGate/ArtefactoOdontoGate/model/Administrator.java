@@ -2,15 +2,15 @@ package com.OdontoGate.ArtefactoOdontoGate.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "\"administrator\"")
-public class Administrator {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
+@PrimaryKeyJoinColumn(name = "id")
+public class Administrator extends User {
+    
     @Column(name = "position")
     private String position;
 }

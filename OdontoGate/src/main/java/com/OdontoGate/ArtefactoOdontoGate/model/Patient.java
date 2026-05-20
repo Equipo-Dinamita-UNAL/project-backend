@@ -1,25 +1,25 @@
 package com.OdontoGate.ArtefactoOdontoGate.model;
 
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "\"patient\"")
-public class Patient {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+@PrimaryKeyJoinColumn(name = "id")
+public class Patient extends User {
+    
+    @Column(name = "birthDate")
+    private LocalDate birthDate;
 
-    @Column(name = "birth_date")
-    private Date birth_date;
-
-    @Column(name = "blood_type")
-    private String blood_type;
+    @Column(name = "bloodType")
+    private String bloodType;
 
     @Column(name = "allergies")
     private String allergies;

@@ -2,21 +2,21 @@ package com.OdontoGate.ArtefactoOdontoGate.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "\"doctor\"")
-public class Doctor {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
+@PrimaryKeyJoinColumn(name = "id")
+public class Doctor extends User {
+    
     @Column(name = "speciality")
     private String speciality;
 
-    @Column(name = "medical_license")
-    private String medical_license;
+    @Column(name = "medicalLicense")
+    private String medicalLicense;
 
-    @Column(name = "photo_url")
-    private String photo_url;
+    @Column(name = "photoUrl")
+    private String photoUrl;
 }
