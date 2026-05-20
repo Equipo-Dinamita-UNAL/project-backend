@@ -5,14 +5,14 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "\"dcotor\"")
+@Table(name = "\"doctor\"")
 public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "speciality")
-    private String birth_date;
+    private String speciality;
 
     @Column(name = "medical_license")
     private String medical_license;
