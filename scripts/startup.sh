@@ -6,7 +6,7 @@
 echo "Clonando el repositorio..."
 git clone https://github.com/Equipo-Dinamita-UNAL/project-backend
 cd project-backend
-cd odontogatePrueba
+cd OdontoGate
 
 # ─────────────────────────────────────────
 # BLOQUE 2: Instalar dependencias con Maven
