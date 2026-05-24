@@ -23,7 +23,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UsuarioCreadoResponse> createUser(
             @RequestBody CrearUsuarioRequest request) {
-        System.out.println("ENTRÓ AL POST NUEVO CON DTO");
+        
         UsuarioCreadoResponse response = userService.createUser(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
