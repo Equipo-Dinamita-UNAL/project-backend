@@ -1,6 +1,8 @@
 package com.OdontoGate.ArtefactoOdontoGate.service;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.requests.CrearUsuarioRequest;
+import com.OdontoGate.ArtefactoOdontoGate.dto.Login.requests.DeleteUserRequest;
+import com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses.DeleteUserResponse;
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses.UsuarioCreadoResponse;
 
 import com.OdontoGate.ArtefactoOdontoGate.model.Administrator;
@@ -10,6 +12,10 @@ import com.OdontoGate.ArtefactoOdontoGate.model.User;
 //import com.OdontoGate.ArtefactoOdontoGate.model.UserType;
 
 import com.OdontoGate.ArtefactoOdontoGate.repository.UserRepository;
+import com.OdontoGate.ArtefactoOdontoGate.repository.AdministratorRepository;
+import com.OdontoGate.ArtefactoOdontoGate.repository.PatientRepository;
+import com.OdontoGate.ArtefactoOdontoGate.repository.DoctorRepository;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,10 +26,17 @@ import java.time.LocalDateTime;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AdministratorRepository administratorRepository;
+    private final PatientRepository patientRepository;
+    private final DoctorRepository doctorRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, AdministratorRepository administratorRepository,
+                       PatientRepository patientRepository, DoctorRepository doctorRepository) {
 
         this.userRepository = userRepository;
+        this.administratorRepository = administratorRepository;
+        this.patientRepository = patientRepository;
+        this.doctorRepository = doctorRepository;
     }
 
     public UsuarioCreadoResponse createUser(CrearUsuarioRequest request) {
@@ -85,4 +98,48 @@ public class UserService {
 
     return response;
 }
+    
+
+    
+    public DeleteUserResponse deleteUser(DeleteUserRequest request){
+        DeleteUserResponse response = new DeleteUserResponse();
+
+        User user = userRepository.findByEmail(request.getEmail());
+
+        if(user == null){
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Correo no asociado con ningún usuario."
+        );
+        }
+
+        Integer userId = user.getId();
+
+        boolean administrator = administratorRepository.existsById(userId);
+
+        if(administrator){
+            administratorRepository.deleteById(userId);
+        }
+
+        boolean patient = patientRepository.existsById(userId);
+
+        if(patient){
+            patientRepository.deleteById(userId);
+        }
+
+        boolean doctor = doctorRepository.existsById(userId);
+
+        if(doctor){
+            doctorRepository.deleteById(userId);
+        }
+
+        userRepository.deleteById(userId);
+
+
+        response.setMensaje("Usuario eliminado correctamente.");
+        response.setEmail(request.getEmail());
+
+        return response;
+    }
+
 }

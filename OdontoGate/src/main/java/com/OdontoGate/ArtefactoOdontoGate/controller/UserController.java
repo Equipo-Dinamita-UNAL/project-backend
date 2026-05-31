@@ -1,6 +1,8 @@
 package com.OdontoGate.ArtefactoOdontoGate.controller;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.requests.CrearUsuarioRequest;
+import com.OdontoGate.ArtefactoOdontoGate.dto.Login.requests.DeleteUserRequest;
+import com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses.DeleteUserResponse;
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses.UsuarioCreadoResponse;
 //import com.OdontoGate.ArtefactoOdontoGate.model.User;
 import com.OdontoGate.ArtefactoOdontoGate.service.UserService;
@@ -29,5 +31,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @DeleteMapping
+    public ResponseEntity<DeleteUserResponse> deleteUser(
+            @RequestBody DeleteUserRequest request) {
+        
+        DeleteUserResponse response = userService.deleteUser(request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
     }

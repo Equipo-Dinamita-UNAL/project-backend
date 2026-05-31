@@ -1,11 +1,11 @@
 package com.OdontoGate.ArtefactoOdontoGate.service;
 
+import com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses.ChangePasswordResponse;
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses.LoginResponse;
+import com.OdontoGate.ArtefactoOdontoGate.dto.Login.requests.ChangePasswordRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.requests.LoginRequest;
 
-import com.OdontoGate.ArtefactoOdontoGate.model.Administrator;
-import com.OdontoGate.ArtefactoOdontoGate.model.Doctor;
-import com.OdontoGate.ArtefactoOdontoGate.model.Patient;
+
 import com.OdontoGate.ArtefactoOdontoGate.model.User;
 import com.OdontoGate.ArtefactoOdontoGate.model.UserType;
 
@@ -81,4 +81,29 @@ public class LoginService {
         return response;
     }
 
+    public ChangePasswordResponse changePassword(ChangePasswordRequest request){
+        ChangePasswordResponse response = new ChangePasswordResponse();
+
+        User user = userRepository.findByEmail(request.getEmail());
+
+        if(user == null){
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Correo no asociado con ningún usuario."
+        );
+        }
+
+        user.setPassword(request.getNewPassword());
+        User savedUser = userRepository.save(user);
+
+        if(savedUser == null){
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "No se pudo cambiar la contraseña."
+        );
+        }
+
+        response.setMensaje("Contraseña actualizada exitosamente.");
+        return response;
+    }
 }
