@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "\"user\"")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 
     @Id
@@ -16,7 +17,7 @@ public class User {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "lastame")
+    @Column(name = "lastname")
     private String lastname;
 
     @Column(name = "email", unique = true)
