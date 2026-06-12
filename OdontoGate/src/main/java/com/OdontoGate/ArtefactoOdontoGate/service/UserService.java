@@ -41,66 +41,66 @@ public class UserService {
 
     public UsuarioCreadoResponse createUser(CrearUsuarioRequest request) {
 
-    if (userRepository.existsByEmail(request.getEmail())) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El email ya está registrado");
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El email ya está registrado");
+        }
+
+        User user;
+
+        switch (request.getUserType()) {
+            case DOCTOR:
+                Doctor doctor = new Doctor();
+                doctor.setSpeciality(request.getSpecialty());
+                doctor.setMedicalLicense(request.getMedicalLicense());
+                doctor.setPhotoUrl(request.getPhotoUrl());
+                user = doctor;
+                break;
+
+            case PATIENT:
+                Patient patient = new Patient();
+                patient.setBirthDate(request.getBirthDate());
+                patient.setBloodType(request.getBloodType());
+                patient.setAllergies(request.getAllergies());
+                patient.setAddress(request.getAddress());
+                user = patient;
+                break;
+
+
+            case ADMINISTRATOR:
+                Administrator administrator = new Administrator();
+                administrator.setPosition(request.getPosition());
+                user = administrator;
+                break;
+
+            default:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tipo de usuario inválido");
+        }
+
+        user.setName(request.getName());
+        user.setLastname(request.getLastname());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        user.setPhone(request.getPhone());
+        user.setActive(true);
+        user.setCreatedAt(LocalDateTime.now());
+
+        User savedUser = userRepository.save(user);
+
+        UsuarioCreadoResponse response = new UsuarioCreadoResponse();
+
+        response.setId(savedUser.getId());
+        response.setName(savedUser.getName());
+        response.setLastname(savedUser.getLastname());
+        response.setEmail(savedUser.getEmail());
+        response.setPhone(savedUser.getPhone());
+        response.setActive(savedUser.getActive());
+        response.setUserType(request.getUserType());
+
+        return response;
     }
 
-    User user;
 
-    switch (request.getUserType()) {
-        case DOCTOR:
-            Doctor doctor = new Doctor();
-            doctor.setSpeciality(request.getSpecialty());
-            doctor.setMedicalLicense(request.getMedicalLicense());
-            doctor.setPhotoUrl(request.getPhotoUrl());
-            user = doctor;
-            break;
 
-        case PATIENT:
-            Patient patient = new Patient();
-            patient.setBirthDate(request.getBirthDate());
-            patient.setBloodType(request.getBloodType());
-            patient.setAllergies(request.getAllergies());
-            patient.setAddress(request.getAddress());
-            user = patient;
-            break;
-            
-
-        case ADMINISTRATOR:
-            Administrator administrator = new Administrator();
-            administrator.setPosition(request.getPosition());
-            user = administrator;
-            break;
-
-        default:
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tipo de usuario inválido");
-    }
-
-    user.setName(request.getName());
-    user.setLastname(request.getLastname());
-    user.setEmail(request.getEmail());
-    user.setPassword(request.getPassword());
-    user.setPhone(request.getPhone());
-    user.setActive(true);
-    user.setCreatedAt(LocalDateTime.now());
-
-    User savedUser = userRepository.save(user);
-
-    UsuarioCreadoResponse response = new UsuarioCreadoResponse();
-
-    response.setId(savedUser.getId());
-    response.setName(savedUser.getName());
-    response.setLastname(savedUser.getLastname());
-    response.setEmail(savedUser.getEmail());
-    response.setPhone(savedUser.getPhone());
-    response.setActive(savedUser.getActive());
-    response.setUserType(request.getUserType());
-
-    return response;
-}
-    
-
-    
     public DeleteUserResponse deleteUser(DeleteUserRequest request){
         DeleteUserResponse response = new DeleteUserResponse();
 
@@ -110,7 +110,7 @@ public class UserService {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
                     "Correo no asociado con ningún usuario."
-        );
+            );
         }
 
         Integer userId = user.getId();

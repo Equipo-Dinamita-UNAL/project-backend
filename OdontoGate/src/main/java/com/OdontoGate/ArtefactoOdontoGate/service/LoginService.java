@@ -30,7 +30,7 @@ public class LoginService {
     private final DoctorRepository doctorRepository;
 
     public LoginService(UserRepository userRepository, AdministratorRepository administratorRepository,
-        PatientRepository patientRepository, DoctorRepository doctorRepository) {
+                        PatientRepository patientRepository, DoctorRepository doctorRepository) {
 
         this.userRepository = userRepository;
         this.administratorRepository = administratorRepository;
@@ -40,43 +40,43 @@ public class LoginService {
 
     public LoginResponse login(LoginRequest request){
 
-        LoginResponse response = new LoginResponse(); 
+        LoginResponse response = new LoginResponse();
 
         User user = userRepository
-            .findByEmailAndPassword(
-                    request.getEmail(),
-                    request.getPassword()
-            );
+                .findByEmailAndPassword(
+                        request.getEmail(),
+                        request.getPassword()
+                );
 
         if(user == null){
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Credenciales inválidas"
-        );
-}
+            );
+        }
         Integer userId = user.getId();
 
         boolean administrator = administratorRepository.existsById(userId);
-        
+
 
         if(administrator){
             response.setUserType(UserType.ADMINISTRATOR);
             return response;
-        } 
+        }
 
         boolean doctor = doctorRepository.existsById(userId);
 
         if(doctor){
             response.setUserType(UserType.DOCTOR);
             return response;
-        } 
+        }
 
         boolean patient = patientRepository.existsById(userId);
 
         if(patient){
             response.setUserType(UserType.PATIENT);
             return response;
-        } 
+        }
 
         return response;
     }
@@ -90,7 +90,7 @@ public class LoginService {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
                     "Correo no asociado con ningún usuario."
-        );
+            );
         }
 
         user.setPassword(request.getNewPassword());
@@ -100,7 +100,7 @@ public class LoginService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "No se pudo cambiar la contraseña."
-        );
+            );
         }
 
         response.setMensaje("Contraseña actualizada exitosamente.");

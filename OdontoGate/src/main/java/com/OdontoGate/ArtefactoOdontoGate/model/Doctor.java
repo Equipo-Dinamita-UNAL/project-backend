@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "\"doctor\"")
 @PrimaryKeyJoinColumn(name = "id")
 public class Doctor extends User {
-    
+
     @Column(name = "speciality")
     private String speciality;
 

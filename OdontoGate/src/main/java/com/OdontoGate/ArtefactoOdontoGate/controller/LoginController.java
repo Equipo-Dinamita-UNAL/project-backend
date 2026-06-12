@@ -26,7 +26,7 @@ public class LoginController {
     @PostMapping
     public ResponseEntity<LoginResponse> login(
             @RequestBody LoginRequest request) {
-        
+
         LoginResponse response = loginService.login(request);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -35,7 +35,7 @@ public class LoginController {
     @PostMapping("/change-password")
     public ResponseEntity<ChangePasswordResponse> changePassword(
             @RequestBody ChangePasswordRequest request) {
-        
+
         ChangePasswordResponse response = loginService.changePassword(request);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
