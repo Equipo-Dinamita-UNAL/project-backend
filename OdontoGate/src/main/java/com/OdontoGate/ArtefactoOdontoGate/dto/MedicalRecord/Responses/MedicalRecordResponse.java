@@ -1,4 +1,4 @@
-package com.OdontoGate.ArtefactoOdontoGate.dto.response;
+package com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses;
 
 import lombok.Data;
 import java.time.LocalDateTime;
