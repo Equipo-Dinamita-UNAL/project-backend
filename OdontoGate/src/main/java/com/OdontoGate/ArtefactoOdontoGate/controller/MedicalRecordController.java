@@ -1,7 +1,7 @@
 package com.OdontoGate.ArtefactoOdontoGate.controller;
 
-import com.OdontoGate.ArtefactoOdontoGate.dto.request.MedicalRecordRequest;
-import com.OdontoGate.ArtefactoOdontoGate.dto.response.MedicalRecordResponse;
+import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Request.MedicalRecordRequest;
+import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses.MedicalRecordResponse;
 import com.OdontoGate.ArtefactoOdontoGate.service.MedicalRecordService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

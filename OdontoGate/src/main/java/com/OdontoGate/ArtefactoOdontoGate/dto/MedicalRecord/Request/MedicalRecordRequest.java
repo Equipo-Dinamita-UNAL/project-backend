@@ -1,4 +1,4 @@
-package com.OdontoGate.ArtefactoOdontoGate.dto.request;
+package com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

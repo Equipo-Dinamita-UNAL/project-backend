@@ -1,8 +1,8 @@
-package com.OdontoGate.ArtefactoOdontoGate.service.impl;
+package com.OdontoGate.ArtefactoOdontoGate.service;
 
-import com.OdontoGate.ArtefactoOdontoGate.dto.request.MedicalRecordRequest;
-import com.OdontoGate.ArtefactoOdontoGate.dto.response.MedicalRecordResponse;
-import com.OdontoGate.ArtefactoOdontoGate.entity.MedicalRecord;
+import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Request.MedicalRecordRequest;
+import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses.MedicalRecordResponse;
+import com.OdontoGate.ArtefactoOdontoGate.model.MedicalRecord;
 import com.OdontoGate.ArtefactoOdontoGate.exception.MedicalRecordNotFoundException;
 import com.OdontoGate.ArtefactoOdontoGate.repository.MedicalRecordRepository;
 import com.OdontoGate.ArtefactoOdontoGate.service.MedicalRecordService;

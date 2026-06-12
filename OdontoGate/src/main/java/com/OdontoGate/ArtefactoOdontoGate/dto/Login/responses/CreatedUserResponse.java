@@ -1,4 +1,4 @@
-package com.OdontoGate.ArtefactoOdontoGate.dto.response;
+package com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses;
 import com.OdontoGate.ArtefactoOdontoGate.model.UserType;
 
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.OdontoGate.ArtefactoOdontoGate.entity;
+package com.OdontoGate.ArtefactoOdontoGate.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
