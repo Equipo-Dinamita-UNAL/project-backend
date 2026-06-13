@@ -18,15 +18,18 @@ public class Receipt {
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
+    @Column(name = "receipt_number", nullable = false)
+    private String receiptNumber;
+
     @Column(name = "type", nullable = false)
     private String type;
 
 
     @Column(name = "pdf_url", nullable = true)
-    private String pdf_url;
+    private String pdfUrl;
 
     @Column(name = "issue_date", nullable = true)
-    private LocalDateTime issue_date;
+    private LocalDateTime issueDate;
 
     @Column(name = "created_at", nullable = true)
     private LocalDateTime createdAt;

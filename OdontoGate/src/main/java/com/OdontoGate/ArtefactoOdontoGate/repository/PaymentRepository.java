@@ -6,11 +6,13 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Integer>{
 
-    List<Payment> findByPatientId(Integer patientId);
+    Optional<Payment> findByAppointmentId(Integer appointmentId);
+    List<Payment> findByAppointmentPatientId(Integer patientId);
     List<Payment> findByStatus(String status);
     List<Payment> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

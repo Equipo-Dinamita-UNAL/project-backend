@@ -33,6 +33,9 @@ public class Appointment {
     @JoinColumn(name = "doctor_schedule_id")
     private Schedule doctorSchedule;
 
+    @OneToOne(mappedBy = "appointment")
+    private Payment payment;
+
     @Column(name = "status")
     private String status;
 

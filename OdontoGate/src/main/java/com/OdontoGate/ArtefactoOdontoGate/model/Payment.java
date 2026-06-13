@@ -16,9 +16,9 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-     //espacio para relacionar con citas
-
-     //espacio para relacionar con pacientes
+    @OneToOne
+    @JoinColumn(name = "appointment_id")
+    private Appointment appointment;
 
     @OneToMany(mappedBy = "payment")
     private List<Receipt> receipts;
@@ -33,7 +33,7 @@ public class Payment {
     private String status;
 
     @Column(name = "gateway_reference", nullable = true)
-    private String gateway_reference;
+    private String gatewayReference;
 
     @Column(name = "created_at", nullable = true)
     private LocalDateTime createdAt;
