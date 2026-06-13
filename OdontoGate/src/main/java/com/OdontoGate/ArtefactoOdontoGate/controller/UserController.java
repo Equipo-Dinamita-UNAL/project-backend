@@ -25,7 +25,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UsuarioCreadoResponse> createUser(
             @RequestBody CrearUsuarioRequest request) {
-        
+
         UsuarioCreadoResponse response = userService.createUser(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -34,10 +34,10 @@ public class UserController {
     @DeleteMapping
     public ResponseEntity<DeleteUserResponse> deleteUser(
             @RequestBody DeleteUserRequest request) {
-        
+
         DeleteUserResponse response = userService.deleteUser(request);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    }
+}

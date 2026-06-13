@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "\"patient\"")
 @PrimaryKeyJoinColumn(name = "id")
 public class Patient extends User {
-    
+
     @Column(name = "birthDate")
     private LocalDate birthDate;
 
@@ -26,5 +26,5 @@ public class Patient extends User {
 
     @Column(name = "address")
     private String address;
-    
+
 }

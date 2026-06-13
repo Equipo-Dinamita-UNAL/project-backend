@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "\"administrator\"")
 @PrimaryKeyJoinColumn(name = "id")
 public class Administrator extends User {
-    
+
     @Column(name = "position")
     private String position;
 }
