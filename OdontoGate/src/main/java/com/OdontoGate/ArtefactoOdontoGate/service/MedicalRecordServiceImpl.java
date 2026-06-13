@@ -1,9 +1,9 @@
-package com.OdontoGate.ArtefactoOdontoGate.service.impl;
+package com.OdontoGate.ArtefactoOdontoGate.service;
 
-import com.OdontoGate.ArtefactoOdontoGate.dto.request.MedicalRecordRequest;
-import com.OdontoGate.ArtefactoOdontoGate.dto.response.MedicalRecordResponse;
-import com.OdontoGate.ArtefactoOdontoGate.entity.MedicalRecord;
-import com.OdontoGate.ArtefactoOdontoGate.exception.MedicalRecordNotFoundException;
+import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Request.MedicalRecordRequest;
+import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses.MedicalRecordResponse;
+import com.OdontoGate.ArtefactoOdontoGate.model.MedicalRecord;
+import com.OdontoGate.ArtefactoOdontoGate.exception.MedicalRecordExceptions;
 import com.OdontoGate.ArtefactoOdontoGate.repository.MedicalRecordRepository;
 import com.OdontoGate.ArtefactoOdontoGate.service.MedicalRecordService;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     @Override
     public MedicalRecordResponse update(Integer id, MedicalRecordRequest request) {
         MedicalRecord record = repository.findById(id)
-                .orElseThrow(() -> new MedicalRecordNotFoundException(id));
+                .orElseThrow(() -> new MedicalRecordExceptions.NotFoundException(id));
         record.setDiagnosis(request.getDiagnosis());
         record.setTreatment(request.getTreatment());
         record.setObservations(request.getObservations());
@@ -44,7 +44,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     @Override
     public MedicalRecordResponse findById(Integer id) {
         MedicalRecord record = repository.findById(id)
-                .orElseThrow(() -> new MedicalRecordNotFoundException(id));
+                .orElseThrow(() -> new MedicalRecordExceptions.NotFoundException(id));
         return toResponse(record);
     }
 
@@ -59,7 +59,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     @Override
     public void delete(Integer id) {
         if (!repository.existsById(id)) {
-            throw new MedicalRecordNotFoundException(id);
+            throw new MedicalRecordExceptions.NotFoundException(id);
         }
         repository.deleteById(id);
     }

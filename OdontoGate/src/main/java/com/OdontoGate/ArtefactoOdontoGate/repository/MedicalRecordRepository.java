@@ -1,6 +1,6 @@
 package com.OdontoGate.ArtefactoOdontoGate.repository;
 
-import com.OdontoGate.ArtefactoOdontoGate.entity.MedicalRecord;
+import com.OdontoGate.ArtefactoOdontoGate.model.MedicalRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
