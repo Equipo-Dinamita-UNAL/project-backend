@@ -2,6 +2,7 @@ package com.OdontoGate.ArtefactoOdontoGate.service;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.request.AppointmentRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.response.AppointmentResponse;
+import com.OdontoGate.ArtefactoOdontoGate.exception.AppointmentExceptions;
 import com.OdontoGate.ArtefactoOdontoGate.model.*;
 import com.OdontoGate.ArtefactoOdontoGate.repository.AppointmentRepository;
 import com.OdontoGate.ArtefactoOdontoGate.dto.request.AppointmentUpdateRequest;
@@ -10,7 +11,6 @@ import com.OdontoGate.ArtefactoOdontoGate.repository.DoctorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.stream.Collectors;
 import com.OdontoGate.ArtefactoOdontoGate.repository.ScheduleRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -68,7 +68,7 @@ public class AppointmentService {
         return appointmentRepository.findAll()
                 .stream()
                 .map(this::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // Obtener citas de un paciente
@@ -76,7 +76,7 @@ public class AppointmentService {
         return appointmentRepository.findByPatientId(patientId)
                 .stream()
                 .map(this::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // Obtener citas de un doctor
@@ -84,7 +84,7 @@ public class AppointmentService {
         return appointmentRepository.findByDoctorId(doctorId)
                 .stream()
                 .map(this::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // Eliminar cita
@@ -145,15 +145,15 @@ public class AppointmentService {
 
         // 1. Fecha futura
         if (!date.isAfter(LocalDate.now())) {
-            throw new RuntimeException("La cita debe agendarse en una fecha futura");
+            throw new AppointmentExceptions.InvalidDateException();
         }
 
         // 2. Horario disponible
         Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
+                .orElseThrow(() -> new AppointmentExceptions.ScheduleNotFoundException(scheduleId));
 
         if (Boolean.FALSE.equals(schedule.getIsAvailable())) {
-            throw new RuntimeException("El horario seleccionado no está disponible");
+            throw new AppointmentExceptions.ScheduleNotAvailableException();
         }
 
         // 3. Sin conflicto de horario con el doctor
@@ -164,7 +164,7 @@ public class AppointmentService {
                 .anyMatch(a -> !a.getId().equals(excludeId));
 
         if (hayConflicto) {
-            throw new RuntimeException("El doctor ya tiene una cita agendada en esa fecha y hora");
+            throw new AppointmentExceptions.DoctorConflictException();
         }
     }
 

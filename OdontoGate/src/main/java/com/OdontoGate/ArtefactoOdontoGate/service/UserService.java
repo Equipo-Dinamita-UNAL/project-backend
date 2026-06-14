@@ -9,7 +9,6 @@ import com.OdontoGate.ArtefactoOdontoGate.model.Administrator;
 import com.OdontoGate.ArtefactoOdontoGate.model.Doctor;
 import com.OdontoGate.ArtefactoOdontoGate.model.Patient;
 import com.OdontoGate.ArtefactoOdontoGate.model.User;
-//import com.OdontoGate.ArtefactoOdontoGate.model.UserType;
 
 import com.OdontoGate.ArtefactoOdontoGate.repository.UserRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.AdministratorRepository;

@@ -94,14 +94,8 @@ public class LoginService {
         }
 
         user.setPassword(request.getNewPassword());
-        User savedUser = userRepository.save(user);
+        userRepository.save(user);
 
-        if(savedUser == null){
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "No se pudo cambiar la contraseña."
-            );
-        }
 
         response.setMensaje("Contraseña actualizada exitosamente.");
         return response;

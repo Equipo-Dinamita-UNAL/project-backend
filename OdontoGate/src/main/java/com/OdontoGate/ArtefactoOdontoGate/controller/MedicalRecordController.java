@@ -1,15 +1,14 @@
 package com.OdontoGate.ArtefactoOdontoGate.controller;
 
-import com.OdontoGate.ArtefactoOdontoGate.dto.request.MedicalRecordRequest;
-import com.OdontoGate.ArtefactoOdontoGate.dto.response.MedicalRecordResponse;
+import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Request.MedicalRecordRequest;
+import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses.MedicalRecordResponse;
 import com.OdontoGate.ArtefactoOdontoGate.service.MedicalRecordService;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/medical-records")
+@RequestMapping("/api/medical-records")
 public class MedicalRecordController {
 
     private final MedicalRecordService service;
@@ -21,14 +20,14 @@ public class MedicalRecordController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public MedicalRecordResponse create(
-            @Valid @RequestBody MedicalRecordRequest request) {
+            @RequestBody MedicalRecordRequest request) {
         return service.create(request);
     }
 
     @PutMapping("/{id}")
     public MedicalRecordResponse update(
             @PathVariable Integer id,
-            @Valid @RequestBody MedicalRecordRequest request) {
+            @RequestBody MedicalRecordRequest request) {
         return service.update(id, request);
     }
 

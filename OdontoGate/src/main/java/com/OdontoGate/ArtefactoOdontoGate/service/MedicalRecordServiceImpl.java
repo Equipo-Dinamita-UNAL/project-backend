@@ -1,14 +1,12 @@
-package com.OdontoGate.ArtefactoOdontoGate.service.impl;
+package com.OdontoGate.ArtefactoOdontoGate.service;
 
-import com.OdontoGate.ArtefactoOdontoGate.dto.request.MedicalRecordRequest;
-import com.OdontoGate.ArtefactoOdontoGate.dto.response.MedicalRecordResponse;
-import com.OdontoGate.ArtefactoOdontoGate.entity.MedicalRecord;
-import com.OdontoGate.ArtefactoOdontoGate.exception.MedicalRecordNotFoundException;
+import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Request.MedicalRecordRequest;
+import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses.MedicalRecordResponse;
+import com.OdontoGate.ArtefactoOdontoGate.model.MedicalRecord;
+import com.OdontoGate.ArtefactoOdontoGate.exception.MedicalRecordExceptions;
 import com.OdontoGate.ArtefactoOdontoGate.repository.MedicalRecordRepository;
-import com.OdontoGate.ArtefactoOdontoGate.service.MedicalRecordService;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MedicalRecordServiceImpl implements MedicalRecordService {
@@ -21,31 +19,31 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Override
     public MedicalRecordResponse create(MedicalRecordRequest request) {
-        MedicalRecord record = new MedicalRecord();
-        record.setPatientId(request.getPatientId());
-        record.setDiagnosis(request.getDiagnosis());
-        record.setTreatment(request.getTreatment());
-        record.setObservations(request.getObservations());
-        record.setDate(request.getDate());
-        return toResponse(repository.save(record));
+        MedicalRecord medicalRecord = new MedicalRecord();
+        medicalRecord.setPatientId(request.getPatientId());
+        medicalRecord.setDiagnosis(request.getDiagnosis());
+        medicalRecord.setTreatment(request.getTreatment());
+        medicalRecord.setObservations(request.getObservations());
+        medicalRecord.setDate(request.getDate());
+        return toResponse(repository.save(medicalRecord));
     }
 
     @Override
     public MedicalRecordResponse update(Integer id, MedicalRecordRequest request) {
-        MedicalRecord record = repository.findById(id)
-                .orElseThrow(() -> new MedicalRecordNotFoundException(id));
-        record.setDiagnosis(request.getDiagnosis());
-        record.setTreatment(request.getTreatment());
-        record.setObservations(request.getObservations());
-        record.setDate(request.getDate());
-        return toResponse(repository.save(record));
+        MedicalRecord medicalRecord = repository.findById(id)
+                .orElseThrow(() -> new MedicalRecordExceptions.NotFoundException(id));
+        medicalRecord.setDiagnosis(request.getDiagnosis());
+        medicalRecord.setTreatment(request.getTreatment());
+        medicalRecord.setObservations(request.getObservations());
+        medicalRecord.setDate(request.getDate());
+        return toResponse(repository.save(medicalRecord));
     }
 
     @Override
     public MedicalRecordResponse findById(Integer id) {
-        MedicalRecord record = repository.findById(id)
-                .orElseThrow(() -> new MedicalRecordNotFoundException(id));
-        return toResponse(record);
+        MedicalRecord medicalRecord = repository.findById(id)
+                .orElseThrow(() -> new MedicalRecordExceptions.NotFoundException(id));
+        return toResponse(medicalRecord);
     }
 
     @Override
@@ -53,26 +51,26 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         return repository.findByPatientId(patientId)
                 .stream()
                 .map(this::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public void delete(Integer id) {
         if (!repository.existsById(id)) {
-            throw new MedicalRecordNotFoundException(id);
+            throw new MedicalRecordExceptions.NotFoundException(id);
         }
         repository.deleteById(id);
     }
 
-    private MedicalRecordResponse toResponse(MedicalRecord record) {
+    private MedicalRecordResponse toResponse(MedicalRecord medicalRecord) {
         MedicalRecordResponse response = new MedicalRecordResponse();
-        response.setId(record.getId());
-        response.setPatientId(record.getPatientId());
-        response.setDiagnosis(record.getDiagnosis());
-        response.setTreatment(record.getTreatment());
-        response.setObservations(record.getObservations());
-        response.setDate(record.getDate());
-        response.setCreatedAt(record.getCreatedAt());
+        response.setId(medicalRecord.getId());
+        response.setPatientId(medicalRecord.getPatientId());
+        response.setDiagnosis(medicalRecord.getDiagnosis());
+        response.setTreatment(medicalRecord.getTreatment());
+        response.setObservations(medicalRecord.getObservations());
+        response.setDate(medicalRecord.getDate());
+        response.setCreatedAt(medicalRecord.getCreatedAt());
         return response;
     }
 }
