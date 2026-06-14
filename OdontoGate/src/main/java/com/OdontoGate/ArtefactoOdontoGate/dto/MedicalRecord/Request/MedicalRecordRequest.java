@@ -3,6 +3,9 @@ package com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Request;
 import lombok.Data;
 import java.time.LocalDateTime;
 
+/**
+ * Define el contrato publico de MedicalRecordRequest.
+ */
 @Data
 public class MedicalRecordRequest {
 

@@ -13,12 +13,18 @@ import java.time.LocalTime;
 import java.util.List;
 
 
+/**
+ * Define el contrato publico de ScheduleService.
+ */
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
 
+    /**
+     * Ejecuta la operacion publica create.
+     */
     public ScheduleResponse create(ScheduleRequest request) {
         Schedule schedule = new Schedule();
         schedule.setWeekday(request.getWeekday());
@@ -36,6 +42,9 @@ public class ScheduleService {
         return toResponse(saved);
     }
 
+    /**
+     * Ejecuta la operacion publica getAll.
+     */
     public List<ScheduleResponse> getAll() {
         return scheduleRepository.findAll()
                 .stream()
@@ -43,6 +52,9 @@ public class ScheduleService {
                 .toList();
     }
 
+    /**
+     * Ejecuta la operacion publica getByDoctor.
+     */
     public List<ScheduleResponse> getByDoctor(Integer doctorId) {
         return scheduleRepository.findByDoctorId(doctorId)
                 .stream()
@@ -50,18 +62,32 @@ public class ScheduleService {
                 .toList();
     }
 
+    /**
+     * Ejecuta la operacion publica delete.
+     */
     public void delete(Integer id) {
         scheduleRepository.deleteById(id);
     }
 
+    /**
+     * Ejecuta la operacion publica update.
+     */
     public ScheduleResponse update(Integer id, ScheduleRequest request) {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
 
-        if (request.getWeekday() != null) schedule.setWeekday(request.getWeekday());
-        if (request.getStartTime() != null) schedule.setStartTime(request.getStartTime());
-        if (request.getEndTime() != null) schedule.setEndTime(request.getEndTime());
-        if (request.getIsAvailable() != null) schedule.setIsAvailable(request.getIsAvailable());
+        if (request.getWeekday() != null) {
+            schedule.setWeekday(request.getWeekday());
+        }
+        if (request.getStartTime() != null) {
+            schedule.setStartTime(request.getStartTime());
+        }
+        if (request.getEndTime() != null) {
+            schedule.setEndTime(request.getEndTime());
+        }
+        if (request.getIsAvailable() != null) {
+            schedule.setIsAvailable(request.getIsAvailable());
+        }
 
         LocalTime startFinal = request.getStartTime() != null ? request.getStartTime() : schedule.getStartTime();
         LocalTime endFinal = request.getEndTime() != null ? request.getEndTime() : schedule.getEndTime();
@@ -72,6 +98,9 @@ public class ScheduleService {
         return toResponse(saved);
     }
 
+    /**
+     * Ejecuta la operacion publica setAvailable.
+     */
     public ScheduleResponse setAvailable(Integer id, Boolean available) {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Horario no encontrado"));

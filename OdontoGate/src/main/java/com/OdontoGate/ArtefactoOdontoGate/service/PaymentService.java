@@ -15,6 +15,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Define el contrato publico de PaymentService.
+ */
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
@@ -23,6 +26,9 @@ public class PaymentService {
     private final AppointmentRepository appointmentRepository;
 
     // Crear pago
+    /**
+     * Ejecuta la operacion publica createPayment.
+     */
     public PaymentResponse createPayment(PaymentRequest request) {
 
         // 0. Verificar si
@@ -50,6 +56,9 @@ public class PaymentService {
     }
 
     // Ver pagos por paciente
+    /**
+     * Ejecuta la operacion publica getPaymentPatient.
+     */
     public List<PaymentResponse> getPaymentPatient(Integer patientId) {
         return paymentRepository.findByAppointmentPatientId(patientId)
                 .stream()
@@ -58,6 +67,9 @@ public class PaymentService {
     }
 
     //Ver pagos por cita
+    /**
+     * Ejecuta la operacion publica getPaymentByAppointment.
+     */
     public PaymentResponse getPaymentByAppointment(Integer appointmentId) {
         Payment payment = paymentRepository.findByAppointmentId(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Pago no encontrado para esta cita"));
@@ -65,6 +77,9 @@ public class PaymentService {
     }
 
     // Ver todos los pagos
+    /**
+     * Ejecuta la operacion publica getAllPayments.
+     */
     public List<PaymentResponse> getAllPayments() {
         return paymentRepository.findAll()
                 .stream()
@@ -73,6 +88,9 @@ public class PaymentService {
     }
 
     // Ver pago por id
+    /**
+     * Ejecuta la operacion publica getPaymentById.
+     */
     public PaymentResponse getPaymentById(Integer id) {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
@@ -80,6 +98,9 @@ public class PaymentService {
     }
 
     // Actualizar estado
+    /**
+     * Ejecuta la operacion publica updateStatus.
+     */
     public PaymentResponse updateStatus(Integer id, String status) {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pago no encontrado"));

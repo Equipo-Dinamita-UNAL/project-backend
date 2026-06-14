@@ -21,6 +21,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
+/**
+ * Define el contrato publico de UserService.
+ */
 @Service
 public class UserService {
 
@@ -29,6 +32,9 @@ public class UserService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
 
+    /**
+     * Ejecuta la operacion publica UserService.
+     */
     public UserService(UserRepository userRepository, AdministratorRepository administratorRepository,
                        PatientRepository patientRepository, DoctorRepository doctorRepository) {
 
@@ -38,43 +44,65 @@ public class UserService {
         this.doctorRepository = doctorRepository;
     }
 
+    /**
+     * Ejecuta la operacion publica createUser.
+     */
     public UsuarioCreadoResponse createUser(CrearUsuarioRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El email ya está registrado");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El email ya estÃ¡ registrado");
         }
 
-        User user;
+        User user = buildUser(request);
 
+        fillCommonUserData(user, request);
+
+        User savedUser = userRepository.save(user);
+
+        return buildCreatedUserResponse(savedUser, request);
+    }
+
+    private User buildUser(CrearUsuarioRequest request) {
         switch (request.getUserType()) {
             case DOCTOR:
-                Doctor doctor = new Doctor();
-                doctor.setSpeciality(request.getSpecialty());
-                doctor.setMedicalLicense(request.getMedicalLicense());
-                doctor.setPhotoUrl(request.getPhotoUrl());
-                user = doctor;
-                break;
+                return buildDoctor(request);
 
             case PATIENT:
-                Patient patient = new Patient();
-                patient.setBirthDate(request.getBirthDate());
-                patient.setBloodType(request.getBloodType());
-                patient.setAllergies(request.getAllergies());
-                patient.setAddress(request.getAddress());
-                user = patient;
-                break;
+                return buildPatient(request);
 
 
             case ADMINISTRATOR:
-                Administrator administrator = new Administrator();
-                administrator.setPosition(request.getPosition());
-                user = administrator;
-                break;
+                return buildAdministrator(request);
 
             default:
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tipo de usuario inválido");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tipo de usuario invÃ¡lido");
         }
+    }
 
+    private Doctor buildDoctor(CrearUsuarioRequest request) {
+        Doctor doctor = new Doctor();
+        doctor.setSpeciality(request.getSpecialty());
+        doctor.setMedicalLicense(request.getMedicalLicense());
+        doctor.setPhotoUrl(request.getPhotoUrl());
+        return doctor;
+    }
+
+    private Patient buildPatient(CrearUsuarioRequest request) {
+        Patient patient = new Patient();
+        patient.setBirthDate(request.getBirthDate());
+        patient.setBloodType(request.getBloodType());
+        patient.setAllergies(request.getAllergies());
+        patient.setAddress(request.getAddress());
+        return patient;
+    }
+
+    private Administrator buildAdministrator(CrearUsuarioRequest request) {
+        Administrator administrator = new Administrator();
+        administrator.setPosition(request.getPosition());
+        return administrator;
+    }
+
+    private void fillCommonUserData(User user, CrearUsuarioRequest request) {
         user.setName(request.getName());
         user.setLastname(request.getLastname());
         user.setEmail(request.getEmail());
@@ -82,9 +110,11 @@ public class UserService {
         user.setPhone(request.getPhone());
         user.setActive(true);
         user.setCreatedAt(LocalDateTime.now());
+    }
 
-        User savedUser = userRepository.save(user);
-
+    private UsuarioCreadoResponse buildCreatedUserResponse(
+            User savedUser,
+            CrearUsuarioRequest request) {
         UsuarioCreadoResponse response = new UsuarioCreadoResponse();
 
         response.setId(savedUser.getId());
@@ -98,8 +128,9 @@ public class UserService {
         return response;
     }
 
-
-
+    /**
+     * Ejecuta la operacion publica deleteUser.
+     */
     public DeleteUserResponse deleteUser(DeleteUserRequest request){
         DeleteUserResponse response = new DeleteUserResponse();
 
@@ -108,7 +139,7 @@ public class UserService {
         if(user == null){
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
-                    "Correo no asociado con ningún usuario."
+                    "Correo no asociado con ningÃºn usuario."
             );
         }
 

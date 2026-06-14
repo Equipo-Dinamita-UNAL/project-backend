@@ -6,6 +6,9 @@ import java.time.LocalDate;
 
 import com.OdontoGate.ArtefactoOdontoGate.model.UserType;
 
+/**
+ * Define el contrato publico de CrearUsuarioRequest.
+ */
 @Data
 public class CrearUsuarioRequest {
     private String name;

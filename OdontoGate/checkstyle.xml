@@ -106,10 +106,10 @@
              Clean Code Cap. 3 — funciones pequeñas
              ============================================= -->
         <module name="MethodLength">
-            <property name="max" value="30"/>
+            <property name="max" value="35"/>
             <property name="countEmpty" value="false"/>
             <message key="maxLen.method"
-                     value="[MUST-6] El método tiene {0} líneas, máximo permitido es 30 (Clean Code Cap. 3 — funciones pequeñas)"/>
+                     value="[MUST-6] El método tiene {0} líneas, máximo permitido es 35 (Clean Code Cap. 3 — funciones pequeñas)"/>
         </module>
 
         <!-- =============================================

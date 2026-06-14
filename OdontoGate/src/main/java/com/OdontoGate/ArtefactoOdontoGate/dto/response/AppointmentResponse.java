@@ -4,6 +4,9 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+/**
+ * Define el contrato publico de AppointmentResponse.
+ */
 @Data
 public class AppointmentResponse {
 

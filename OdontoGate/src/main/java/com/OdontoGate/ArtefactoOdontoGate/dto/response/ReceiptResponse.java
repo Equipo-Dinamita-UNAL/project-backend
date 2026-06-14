@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+/**
+ * Define el contrato publico de ReceiptResponse.
+ */
 @Data
 public class ReceiptResponse {
     private Integer id;
