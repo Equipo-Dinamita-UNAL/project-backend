@@ -1,8 +1,11 @@
-package com.OdontoGate.OdontoGate.dto.response;
+package com.OdontoGate.ArtefactoOdontoGate.dto.response;
 
 import lombok.Data;
 import java.time.LocalTime;
 
+/**
+ * Define el contrato publico de ScheduleResponse.
+ */
 @Data
 public class ScheduleResponse {
 

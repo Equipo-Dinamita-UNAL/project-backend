@@ -1,8 +1,11 @@
-package com.OdontoGate.OdontoGate.dto.request;
+package com.OdontoGate.ArtefactoOdontoGate.dto.request;
 
 import lombok.Data;
 import java.time.LocalTime;
 
+/**
+ * Define el contrato publico de ScheduleRequest.
+ */
 @Data
 public class ScheduleRequest {
 

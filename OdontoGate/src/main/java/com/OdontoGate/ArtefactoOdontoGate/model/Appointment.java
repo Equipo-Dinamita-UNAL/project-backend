@@ -1,11 +1,22 @@
-package com.OdontoGate.OdontoGate.model;
+package com.OdontoGate.ArtefactoOdontoGate.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+/**
+ * Define el contrato publico de Appointment.
+ */
 @Data
 @Entity
 @Table(name = "appointment")
@@ -32,6 +43,9 @@ public class Appointment {
     @ManyToOne
     @JoinColumn(name = "doctor_schedule_id")
     private Schedule doctorSchedule;
+
+    @OneToOne(mappedBy = "appointment")
+    private Payment payment;
 
     @Column(name = "status")
     private String status;
