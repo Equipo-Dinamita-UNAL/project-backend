@@ -2,6 +2,7 @@ package com.OdontoGate.ArtefactoOdontoGate.service;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.request.ReceiptRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.response.ReceiptResponse;
+import com.OdontoGate.ArtefactoOdontoGate.exception.ReceiptExceptions;
 import com.OdontoGate.ArtefactoOdontoGate.model.Payment;
 import com.OdontoGate.ArtefactoOdontoGate.model.Receipt;
 import com.OdontoGate.ArtefactoOdontoGate.repository.PaymentRepository;
@@ -22,16 +23,16 @@ public class ReceiptService {
 
         // 1. Verificar que el pago existe
         Payment payment = paymentRepository.findById(request.getPaymentId())
-                .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
+                .orElseThrow(() -> new ReceiptExceptions.PaymentNotFoundException(request.getPaymentId()));
 
         // 2. Verificar que el pago está pagado
         if (!payment.getStatus().equals("PAGADO")) {
-            throw new RuntimeException("No se puede generar comprobante de un pago pendiente");
+            throw new ReceiptExceptions.PaymentNotPaidException();
         }
 
         // 3. Verificar que no tiene comprobante
         receiptRepository.findByPaymentId(request.getPaymentId())
-                .ifPresent(r -> { throw new RuntimeException("Este pago ya tiene un comprobante"); });
+                .ifPresent(r -> { throw new ReceiptExceptions.ReceiptAlreadyExistsException(); });
 
         // 4. Crear comprobante
         Receipt receipt = new Receipt();

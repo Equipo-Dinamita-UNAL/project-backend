@@ -44,7 +44,7 @@ public class PaymentController {
     // Ver pago por id - GET
     @GetMapping("/{id}")
     public ResponseEntity<PaymentResponse> getPaymentById(@PathVariable Integer id) {
-        return ResponseEntity.ok(paymentService.GetPaymentById(id));
+        return ResponseEntity.ok(paymentService.getPaymentById(id));
     }
 
     // Actualizar estado - PUT

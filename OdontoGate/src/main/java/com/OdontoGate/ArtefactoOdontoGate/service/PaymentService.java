@@ -3,6 +3,7 @@ package com.OdontoGate.ArtefactoOdontoGate.service;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.request.PaymentRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.response.PaymentResponse;
+import com.OdontoGate.ArtefactoOdontoGate.exception.PaymentExceptions;
 import com.OdontoGate.ArtefactoOdontoGate.model.Appointment;
 import com.OdontoGate.ArtefactoOdontoGate.model.Payment;
 import com.OdontoGate.ArtefactoOdontoGate.repository.AppointmentRepository;
@@ -10,9 +11,9 @@ import com.OdontoGate.ArtefactoOdontoGate.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,13 +25,18 @@ public class PaymentService {
     // Crear pago
     public PaymentResponse createPayment(PaymentRequest request) {
 
+        // 0. Verificar si
+        if (request.getAmount() == null || request.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            throw new PaymentExceptions.InvalidAmountException();
+        }
+
         // 1. Verificar que la cita existe
         Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
-                .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+                .orElseThrow(() -> new PaymentExceptions.AppointmentNotFoundException(request.getAppointmentId()));
 
         // 2. Verificar que la cita no tiene pago
         paymentRepository.findByAppointmentId(request.getAppointmentId())
-                .ifPresent(p -> { throw new RuntimeException("Esta cita ya tiene un pago"); });
+                .ifPresent(p -> { throw new PaymentExceptions.PaymentAlreadyExistsException(); });
 
         // 3. Crear el pago
         Payment payment = new Payment();
@@ -48,7 +54,7 @@ public class PaymentService {
         return paymentRepository.findByAppointmentPatientId(patientId)
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     //Ver pagos por cita
@@ -63,11 +69,11 @@ public class PaymentService {
         return paymentRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // Ver pago por id
-    public PaymentResponse GetPaymentById(Integer id) {
+    public PaymentResponse getPaymentById(Integer id) {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
         return mapToResponse(payment);

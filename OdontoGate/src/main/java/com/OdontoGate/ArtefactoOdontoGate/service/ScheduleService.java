@@ -2,6 +2,7 @@ package com.OdontoGate.ArtefactoOdontoGate.service;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.request.ScheduleRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.response.ScheduleResponse;
+import com.OdontoGate.ArtefactoOdontoGate.exception.ScheduleExceptions;
 import com.OdontoGate.ArtefactoOdontoGate.model.Doctor;
 import com.OdontoGate.ArtefactoOdontoGate.model.Schedule;
 import com.OdontoGate.ArtefactoOdontoGate.repository.ScheduleRepository;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -39,14 +40,14 @@ public class ScheduleService {
         return scheduleRepository.findAll()
                 .stream()
                 .map(this::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<ScheduleResponse> getByDoctor(Integer doctorId) {
         return scheduleRepository.findByDoctorId(doctorId)
                 .stream()
                 .map(this::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public void delete(Integer id) {
@@ -83,7 +84,7 @@ public class ScheduleService {
 
     private void validarHorario(LocalTime startTime, LocalTime endTime) {
         if (!startTime.isBefore(endTime)) {
-            throw new RuntimeException("La hora de inicio debe ser anterior a la hora de fin");
+            throw new ScheduleExceptions.InvalidScheduleTimeException();
         }
     }
 

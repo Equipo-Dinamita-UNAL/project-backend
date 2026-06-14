@@ -4,12 +4,10 @@ import com.OdontoGate.ArtefactoOdontoGate.dto.Login.requests.CrearUsuarioRequest
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.requests.DeleteUserRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses.DeleteUserResponse;
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses.UsuarioCreadoResponse;
-//import com.OdontoGate.ArtefactoOdontoGate.model.User;
 import com.OdontoGate.ArtefactoOdontoGate.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
-//import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
