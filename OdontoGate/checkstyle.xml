@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+    OdontoGate Backend — Reglas de Clean Code (Robert C. Martin)
+    Ejecutar con: mvn checkstyle:check
+-->
+<module name="Checker">
+
+    <property name="severity" value="error"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- Excluir clases generadas y main -->
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="OdontoGateApplication\.java$"/>
+    </module>
+
+    <module name="TreeWalker">
+
+        <!-- =============================================
+             MUST 1 — Nombres que revelan intención
+             Clean Code Cap. 2
+             ============================================= -->
+
+        <!-- Clases en PascalCase -->
+        <module name="TypeName">
+            <property name="format" value="^[A-Z][a-zA-Z0-9]*$"/>
+            <message key="name.invalidPattern"
+                     value="[MUST-1] El nombre de la clase ''{0}'' debe estar en PascalCase (Clean Code Cap. 2)"/>
+        </module>
+
+        <!-- Métodos en camelCase -->
+        <module name="MethodName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+            <message key="name.invalidPattern"
+                     value="[MUST-1] El nombre del método ''{0}'' debe estar en camelCase (Clean Code Cap. 2)"/>
+        </module>
+
+        <!-- Variables en camelCase -->
+        <module name="LocalVariableName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+            <message key="name.invalidPattern"
+                     value="[MUST-1] La variable ''{0}'' debe estar en camelCase (Clean Code Cap. 2)"/>
+        </module>
+
+        <!-- Parámetros en camelCase -->
+        <module name="ParameterName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+            <message key="name.invalidPattern"
+                     value="[MUST-1] El parámetro ''{0}'' debe estar en camelCase (Clean Code Cap. 2)"/>
+        </module>
+
+        <!-- Campos en camelCase -->
+        <module name="MemberName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+            <message key="name.invalidPattern"
+                     value="[MUST-1] El campo ''{0}'' debe estar en camelCase (Clean Code Cap. 2)"/>
+        </module>
+
+        <!-- =============================================
+             MUST 2 — Sin imports con wildcard
+             Clean Code Cap. 2 — imports explícitos
+             ============================================= -->
+        <module name="AvoidStarImport">
+            <message key="import.avoidStar"
+                     value="[MUST-2] Import con wildcard ''{0}.*'' no permitido — usa imports explícitos (Clean Code Cap. 2)"/>
+        </module>
+
+        <!-- =============================================
+             MUST 3 — Sin código comentado
+             Clean Code Cap. 4
+             ============================================= -->
+        <module name="Regexp">
+            <property name="format" value="//.*;\s*$"/>
+            <property name="illegalPattern" value="true"/>
+            <property name="message"
+                      value="[MUST-3] Código comentado detectado — elimínalo del repositorio (Clean Code Cap. 4)"/>
+        </module>
+
+        <!-- =============================================
+             MUST 4 — Javadoc en clases públicas
+             Clean Code — Documentación
+             ============================================= -->
+        <module name="MissingJavadocType">
+            <property name="scope" value="public"/>
+            <property name="tokens" value="CLASS_DEF, INTERFACE_DEF"/>
+            <message key="javadoc.missing"
+                     value="[MUST-4] La clase pública ''{0}'' debe tener Javadoc explicando su propósito"/>
+        </module>
+
+        <!-- =============================================
+             MUST 5 — Javadoc en métodos públicos
+             Clean Code — Documentación
+             ============================================= -->
+        <module name="MissingJavadocMethod">
+            <property name="scope" value="public"/>
+            <property name="allowMissingPropertyJavadoc" value="true"/>
+            <message key="javadoc.missing"
+                     value="[MUST-5] El método público debe tener Javadoc con @param y @return"/>
+        </module>
+
+        <!-- =============================================
+             MUST 6 — Métodos no demasiado largos
+             Clean Code Cap. 3 — funciones pequeñas
+             ============================================= -->
+        <module name="MethodLength">
+            <property name="max" value="30"/>
+            <property name="countEmpty" value="false"/>
+            <message key="maxLen.method"
+                     value="[MUST-6] El método tiene {0} líneas, máximo permitido es 30 (Clean Code Cap. 3 — funciones pequeñas)"/>
+        </module>
+
+        <!-- =============================================
+             MUST 7 — Máximo parámetros por método
+             Clean Code Cap. 3
+             ============================================= -->
+        <module name="ParameterNumber">
+            <property name="max" value="5"/>
+            <message key="maxParam"
+                     value="[MUST-7] El método tiene {0} parámetros, máximo permitido es 5 (Clean Code Cap. 3)"/>
+        </module>
+
+        <!-- =============================================
+             SHOULD 1 — Sin imports no utilizados
+             Clean Code — Sin código muerto
+             ============================================= -->
+        <module name="UnusedImports">
+            <message key="import.unused"
+                     value="[SHOULD-1] Import no utilizado ''{0}'' — elimínalo (Clean Code Cap. 17)"/>
+        </module>
+
+        <!-- =============================================
+             SHOULD 2 — Llaves siempre presentes
+             Buenas prácticas Java
+             ============================================= -->
+        <module name="NeedBraces">
+            <message key="needBraces"
+                     value="[SHOULD-2] El bloque ''{0}'' debe usar llaves '{}' aunque tenga una sola línea"/>
+        </module>
+
+        <!-- =============================================
+             SHOULD 3 — Una sola instrucción por línea
+             Clean Code — legibilidad
+             ============================================= -->
+        <module name="OneStatementPerLine">
+            <message key="multiple.statements.line"
+                     value="[SHOULD-3] Solo una instrucción por línea (Clean Code — legibilidad)"/>
+        </module>
+
+    </module>
+
+</module>
