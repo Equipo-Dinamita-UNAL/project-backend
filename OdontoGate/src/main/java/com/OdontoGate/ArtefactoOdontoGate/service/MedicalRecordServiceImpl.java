@@ -8,15 +8,24 @@ import com.OdontoGate.ArtefactoOdontoGate.repository.MedicalRecordRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+/**
+ * Define el contrato publico de MedicalRecordServiceImpl.
+ */
 @Service
 public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     private final MedicalRecordRepository repository;
 
+    /**
+     * Ejecuta la operacion publica MedicalRecordServiceImpl.
+     */
     public MedicalRecordServiceImpl(MedicalRecordRepository repository) {
         this.repository = repository;
     }
 
+    /**
+     * Ejecuta la operacion publica create.
+     */
     @Override
     public MedicalRecordResponse create(MedicalRecordRequest request) {
         MedicalRecord medicalRecord = new MedicalRecord();
@@ -28,6 +37,9 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         return toResponse(repository.save(medicalRecord));
     }
 
+    /**
+     * Ejecuta la operacion publica update.
+     */
     @Override
     public MedicalRecordResponse update(Integer id, MedicalRecordRequest request) {
         MedicalRecord medicalRecord = repository.findById(id)
@@ -39,6 +51,9 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         return toResponse(repository.save(medicalRecord));
     }
 
+    /**
+     * Ejecuta la operacion publica findById.
+     */
     @Override
     public MedicalRecordResponse findById(Integer id) {
         MedicalRecord medicalRecord = repository.findById(id)
@@ -46,6 +61,9 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         return toResponse(medicalRecord);
     }
 
+    /**
+     * Ejecuta la operacion publica findByPatient.
+     */
     @Override
     public List<MedicalRecordResponse> findByPatient(Integer patientId) {
         return repository.findByPatientId(patientId)
@@ -54,6 +72,9 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
                 .toList();
     }
 
+    /**
+     * Ejecuta la operacion publica delete.
+     */
     @Override
     public void delete(Integer id) {
         if (!repository.existsById(id)) {

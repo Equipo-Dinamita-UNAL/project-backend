@@ -6,8 +6,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Define el contrato publico de ReceiptRepository.
+ */
 @Repository
 public interface ReceiptRepository extends JpaRepository<Receipt, Integer> {
 
+    /**
+     * Ejecuta la operacion publica findByPaymentId.
+     */
     Optional<Receipt> findByPaymentId(Integer paymentId);
 }

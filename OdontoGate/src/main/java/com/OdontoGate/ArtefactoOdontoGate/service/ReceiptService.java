@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+/**
+ * Define el contrato publico de ReceiptService.
+ */
 @Service
 @RequiredArgsConstructor
 public class ReceiptService {
@@ -19,6 +22,9 @@ public class ReceiptService {
     private final PaymentRepository paymentRepository;
 
     // Generar comprobante
+    /**
+     * Ejecuta la operacion publica createReceipt.
+     */
     public ReceiptResponse createReceipt(ReceiptRequest request) {
 
         // 1. Verificar que el pago existe
@@ -46,6 +52,9 @@ public class ReceiptService {
     }
 
     // Obtener comprobante por pago
+    /**
+     * Ejecuta la operacion publica getReceiptByPayment.
+     */
     public ReceiptResponse getReceiptByPayment(Integer paymentId) {
         Receipt receipt = receiptRepository.findByPaymentId(paymentId)
                 .orElseThrow(() -> new RuntimeException("Comprobante no encontrado"));
@@ -53,6 +62,9 @@ public class ReceiptService {
     }
 
     // Obtener comprobante por id
+    /**
+     * Ejecuta la operacion publica getReceiptById.
+     */
     public ReceiptResponse getReceiptById(Integer id) {
         Receipt receipt = receiptRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Comprobante no encontrado"));

@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 
+/**
+ * Define el contrato publico de PaymentRequest.
+ */
 @Data
 public class PaymentRequest {
     private Integer appointmentId;

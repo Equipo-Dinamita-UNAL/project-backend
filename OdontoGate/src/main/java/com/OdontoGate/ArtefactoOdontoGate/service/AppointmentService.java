@@ -3,7 +3,11 @@ package com.OdontoGate.ArtefactoOdontoGate.service;
 import com.OdontoGate.ArtefactoOdontoGate.dto.request.AppointmentRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.response.AppointmentResponse;
 import com.OdontoGate.ArtefactoOdontoGate.exception.AppointmentExceptions;
-import com.OdontoGate.ArtefactoOdontoGate.model.*;
+import com.OdontoGate.ArtefactoOdontoGate.model.Appointment;
+import com.OdontoGate.ArtefactoOdontoGate.model.Doctor;
+import com.OdontoGate.ArtefactoOdontoGate.model.Patient;
+import com.OdontoGate.ArtefactoOdontoGate.model.Schedule;
+import com.OdontoGate.ArtefactoOdontoGate.model.User;
 import com.OdontoGate.ArtefactoOdontoGate.repository.AppointmentRepository;
 import com.OdontoGate.ArtefactoOdontoGate.dto.request.AppointmentUpdateRequest;
 import com.OdontoGate.ArtefactoOdontoGate.repository.PatientRepository;
@@ -15,6 +19,9 @@ import com.OdontoGate.ArtefactoOdontoGate.repository.ScheduleRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+/**
+ * Define el contrato publico de AppointmentService.
+ */
 @Service
 @RequiredArgsConstructor
 public class AppointmentService {
@@ -25,6 +32,9 @@ public class AppointmentService {
     private final ScheduleRepository scheduleRepository;
 
     // Crear cita
+    /**
+     * Ejecuta la operacion publica create.
+     */
     public AppointmentResponse create(AppointmentRequest request) {
         Appointment appointment = new Appointment();
         appointment.setDate(request.getDate());
@@ -64,6 +74,9 @@ public class AppointmentService {
     }
 
     // Obtener todas las citas
+    /**
+     * Ejecuta la operacion publica getAll.
+     */
     public List<AppointmentResponse> getAll() {
         return appointmentRepository.findAll()
                 .stream()
@@ -72,6 +85,9 @@ public class AppointmentService {
     }
 
     // Obtener citas de un paciente
+    /**
+     * Ejecuta la operacion publica getByPatient.
+     */
     public List<AppointmentResponse> getByPatient(Integer patientId) {
         return appointmentRepository.findByPatientId(patientId)
                 .stream()
@@ -80,6 +96,9 @@ public class AppointmentService {
     }
 
     // Obtener citas de un doctor
+    /**
+     * Ejecuta la operacion publica getByDoctor.
+     */
     public List<AppointmentResponse> getByDoctor(Integer doctorId) {
         return appointmentRepository.findByDoctorId(doctorId)
                 .stream()
@@ -88,18 +107,24 @@ public class AppointmentService {
     }
 
     // Eliminar cita
+    /**
+     * Ejecuta la operacion publica delete.
+     */
     public void delete(Integer id) {
         appointmentRepository.deleteById(id);
     }
 
     // Modificar cita
+    /**
+     * Ejecuta la operacion publica update.
+     */
     public AppointmentResponse update(Integer id, AppointmentUpdateRequest request) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
-        if (request.getDate() != null) appointment.setDate(request.getDate());
-        if (request.getTime() != null) appointment.setTime(request.getTime());
-        if (request.getReason() != null) appointment.setReason(request.getReason());
+        if (request.getDate() != null) { appointment.setDate(request.getDate()); }
+        if (request.getTime() != null) { appointment.setTime(request.getTime()); }
+        if (request.getReason() != null) { appointment.setReason(request.getReason()); }
 
         if (request.getDoctorScheduleId() != null) {
             Schedule schedule = new Schedule();
@@ -128,6 +153,9 @@ public class AppointmentService {
     }
 
     // Cancelar cita
+    /**
+     * Ejecuta la operacion publica cancel.
+     */
     public AppointmentResponse cancel(Integer id) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));

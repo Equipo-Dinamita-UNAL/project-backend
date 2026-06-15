@@ -21,6 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 
+/**
+ * Define el contrato publico de LoginService.
+ */
 @Service
 public class LoginService {
 
@@ -29,6 +32,9 @@ public class LoginService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
 
+    /**
+     * Ejecuta la operacion publica LoginService.
+     */
     public LoginService(UserRepository userRepository, AdministratorRepository administratorRepository,
                         PatientRepository patientRepository, DoctorRepository doctorRepository) {
 
@@ -38,15 +44,14 @@ public class LoginService {
         this.doctorRepository = doctorRepository;
     }
 
+    /**
+     * Ejecuta la operacion publica login.
+     */
     public LoginResponse login(LoginRequest request){
 
         LoginResponse response = new LoginResponse();
 
-        User user = userRepository
-                .findByEmailAndPassword(
-                        request.getEmail(),
-                        request.getPassword()
-                );
+        User user = findUserByCredentials(request);
 
         if(user == null){
             throw new ResponseStatusException(
@@ -54,33 +59,43 @@ public class LoginService {
                     "Credenciales inválidas"
             );
         }
-        Integer userId = user.getId();
+        setUserType(response, user.getId());
 
+        return response;
+    }
+
+    private User findUserByCredentials(LoginRequest request) {
+        return userRepository.findByEmailAndPassword(
+                request.getEmail(),
+                request.getPassword()
+        );
+    }
+
+    private void setUserType(LoginResponse response, Integer userId) {
         boolean administrator = administratorRepository.existsById(userId);
-
 
         if(administrator){
             response.setUserType(UserType.ADMINISTRATOR);
-            return response;
+            return;
         }
 
         boolean doctor = doctorRepository.existsById(userId);
 
         if(doctor){
             response.setUserType(UserType.DOCTOR);
-            return response;
+            return;
         }
 
         boolean patient = patientRepository.existsById(userId);
 
         if(patient){
             response.setUserType(UserType.PATIENT);
-            return response;
         }
-
-        return response;
     }
 
+    /**
+     * Ejecuta la operacion publica changePassword.
+     */
     public ChangePasswordResponse changePassword(ChangePasswordRequest request){
         ChangePasswordResponse response = new ChangePasswordResponse();
 
