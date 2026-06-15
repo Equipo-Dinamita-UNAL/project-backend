@@ -7,9 +7,6 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Define el contrato publico de Doctor.
- */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity

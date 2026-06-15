@@ -15,9 +15,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Define el contrato publico de Payment.
- */
 @Data
 @Entity
 @Table(name = "\"payment\"")
@@ -28,7 +25,7 @@ public class Payment {
     private Integer id;
 
     @OneToOne
-    @JoinColumn(name = "appointment_id")
+    @JoinColumn(name = "appointment_id", referencedColumnName = "id", nullable = false)
     private Appointment appointment;
 
     @OneToMany(mappedBy = "payment")

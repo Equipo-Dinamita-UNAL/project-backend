@@ -3,9 +3,6 @@ import com.OdontoGate.ArtefactoOdontoGate.model.UserType;
 
 import lombok.Data;
 
-/**
- * Define el contrato publico de UsuarioCreadoResponse.
- */
 @Data
 public class UsuarioCreadoResponse {
     private Integer id;

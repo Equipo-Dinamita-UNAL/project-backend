@@ -13,19 +13,13 @@ import java.time.LocalTime;
 import java.util.List;
 
 
-/**
- * Define el contrato publico de ScheduleService.
- */
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
 
-    /**
-     * Ejecuta la operacion publica create.
-     */
-    public ScheduleResponse create(ScheduleRequest request) {
+        public ScheduleResponse create(ScheduleRequest request) {
         Schedule schedule = new Schedule();
         schedule.setWeekday(request.getWeekday());
         schedule.setStartTime(request.getStartTime());
@@ -42,37 +36,25 @@ public class ScheduleService {
         return toResponse(saved);
     }
 
-    /**
-     * Ejecuta la operacion publica getAll.
-     */
-    public List<ScheduleResponse> getAll() {
+        public List<ScheduleResponse> getAll() {
         return scheduleRepository.findAll()
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    /**
-     * Ejecuta la operacion publica getByDoctor.
-     */
-    public List<ScheduleResponse> getByDoctor(Integer doctorId) {
+        public List<ScheduleResponse> getByDoctor(Integer doctorId) {
         return scheduleRepository.findByDoctorId(doctorId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    /**
-     * Ejecuta la operacion publica delete.
-     */
-    public void delete(Integer id) {
+        public void delete(Integer id) {
         scheduleRepository.deleteById(id);
     }
 
-    /**
-     * Ejecuta la operacion publica update.
-     */
-    public ScheduleResponse update(Integer id, ScheduleRequest request) {
+        public ScheduleResponse update(Integer id, ScheduleRequest request) {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
 
@@ -98,10 +80,7 @@ public class ScheduleService {
         return toResponse(saved);
     }
 
-    /**
-     * Ejecuta la operacion publica setAvailable.
-     */
-    public ScheduleResponse setAvailable(Integer id, Boolean available) {
+        public ScheduleResponse setAvailable(Integer id, Boolean available) {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
 

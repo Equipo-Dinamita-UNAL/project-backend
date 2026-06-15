@@ -3,9 +3,6 @@ package com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses;
 import lombok.Data;
 import java.time.LocalDateTime;
 
-/**
- * Define el contrato publico de MedicalRecordResponse.
- */
 @Data
 public class MedicalRecordResponse {
 

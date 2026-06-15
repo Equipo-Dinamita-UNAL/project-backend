@@ -12,9 +12,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * Define el contrato publico de Receipt.
- */
 @Data
 @Entity
 @Table(name = "\"receipt\"")
