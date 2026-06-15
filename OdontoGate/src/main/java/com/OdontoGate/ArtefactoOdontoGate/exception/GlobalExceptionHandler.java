@@ -11,18 +11,12 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Define el contrato publico de GlobalExceptionHandler.
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final String ERROR_KEY = "error";
 
-    /**
-     * Ejecuta la operacion publica handleNotFound.
-     */
-    @ExceptionHandler(MedicalRecordExceptions.NotFoundException.class)
+        @ExceptionHandler(MedicalRecordExceptions.NotFoundException.class)
     public ResponseEntity<Map<String, String>> handleNotFound(
             MedicalRecordExceptions.NotFoundException ex) {
 
@@ -31,10 +25,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handleValidation.
-     */
-    @ExceptionHandler(MedicalRecordExceptions.ValidationException.class)
+        @ExceptionHandler(MedicalRecordExceptions.ValidationException.class)
     public ResponseEntity<Map<String, String>> handleValidation(
             MedicalRecordExceptions.ValidationException ex) {
 
@@ -43,10 +34,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handleGeneric.
-     */
-    @ExceptionHandler(Exception.class)
+        @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneric(Exception ex) {
 
         Map<String, String> error = new HashMap<>();
@@ -54,10 +42,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handleRuntimeException.
-     */
-    @ExceptionHandler(RuntimeException.class)
+        @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
         Map<String, Object> error = new HashMap<>();
         error.put("timestamp", LocalDateTime.now());
@@ -66,10 +51,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handlePaymentNotFound.
-     */
-    @ExceptionHandler(PaymentExceptions.PaymentNotFoundException.class)
+        @ExceptionHandler(PaymentExceptions.PaymentNotFoundException.class)
     public ResponseEntity<Map<String, String>> handlePaymentNotFound(
             PaymentExceptions.PaymentNotFoundException ex) {
         Map<String, String> error = new HashMap<>();
@@ -77,10 +59,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handleAppointmentNotFound.
-     */
-    @ExceptionHandler(PaymentExceptions.AppointmentNotFoundException.class)
+        @ExceptionHandler(PaymentExceptions.AppointmentNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleAppointmentNotFound(
             PaymentExceptions.AppointmentNotFoundException ex) {
         Map<String, String> error = new HashMap<>();
@@ -88,10 +67,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handlePaymentAlreadyExists.
-     */
-    @ExceptionHandler(PaymentExceptions.PaymentAlreadyExistsException.class)
+        @ExceptionHandler(PaymentExceptions.PaymentAlreadyExistsException.class)
     public ResponseEntity<Map<String, String>> handlePaymentAlreadyExists(
             PaymentExceptions.PaymentAlreadyExistsException ex) {
         Map<String, String> error = new HashMap<>();
@@ -99,10 +75,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handleInvalidAmount.
-     */
-    @ExceptionHandler(PaymentExceptions.InvalidAmountException.class)
+        @ExceptionHandler(PaymentExceptions.InvalidAmountException.class)
     public ResponseEntity<Map<String, String>> handleInvalidAmount(
             PaymentExceptions.InvalidAmountException ex) {
         Map<String, String> error = new HashMap<>();
@@ -110,10 +83,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handleReceiptPaymentNotFound.
-     */
-    @ExceptionHandler(ReceiptExceptions.PaymentNotFoundException.class)
+        @ExceptionHandler(ReceiptExceptions.PaymentNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleReceiptPaymentNotFound(
             ReceiptExceptions.PaymentNotFoundException ex) {
         Map<String, String> error = new HashMap<>();
@@ -121,10 +91,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handlePaymentNotPaid.
-     */
-    @ExceptionHandler(ReceiptExceptions.PaymentNotPaidException.class)
+        @ExceptionHandler(ReceiptExceptions.PaymentNotPaidException.class)
     public ResponseEntity<Map<String, String>> handlePaymentNotPaid(
             ReceiptExceptions.PaymentNotPaidException ex) {
         Map<String, String> error = new HashMap<>();
@@ -132,10 +99,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handleReceiptAlreadyExists.
-     */
-    @ExceptionHandler(ReceiptExceptions.ReceiptAlreadyExistsException.class)
+        @ExceptionHandler(ReceiptExceptions.ReceiptAlreadyExistsException.class)
     public ResponseEntity<Map<String, String>> handleReceiptAlreadyExists(
             ReceiptExceptions.ReceiptAlreadyExistsException ex) {
         Map<String, String> error = new HashMap<>();
@@ -143,10 +107,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handleInvalidDate.
-     */
-    @ExceptionHandler(AppointmentExceptions.InvalidDateException.class)
+        @ExceptionHandler(AppointmentExceptions.InvalidDateException.class)
     public ResponseEntity<Map<String, String>> handleInvalidDate(
             AppointmentExceptions.InvalidDateException ex) {
         Map<String, String> error = new HashMap<>();
@@ -154,10 +115,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handleScheduleNotFound.
-     */
-    @ExceptionHandler(AppointmentExceptions.ScheduleNotFoundException.class)
+        @ExceptionHandler(AppointmentExceptions.ScheduleNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleScheduleNotFound(
             AppointmentExceptions.ScheduleNotFoundException ex) {
         Map<String, String> error = new HashMap<>();
@@ -165,10 +123,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handleScheduleNotAvailable.
-     */
-    @ExceptionHandler(AppointmentExceptions.ScheduleNotAvailableException.class)
+        @ExceptionHandler(AppointmentExceptions.ScheduleNotAvailableException.class)
     public ResponseEntity<Map<String, String>> handleScheduleNotAvailable(
             AppointmentExceptions.ScheduleNotAvailableException ex) {
         Map<String, String> error = new HashMap<>();
@@ -176,10 +131,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handleDoctorConflict.
-     */
-    @ExceptionHandler(AppointmentExceptions.DoctorConflictException.class)
+        @ExceptionHandler(AppointmentExceptions.DoctorConflictException.class)
     public ResponseEntity<Map<String, String>> handleDoctorConflict(
             AppointmentExceptions.DoctorConflictException ex) {
         Map<String, String> error = new HashMap<>();
@@ -187,10 +139,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
-    /**
-     * Ejecuta la operacion publica handleInvalidScheduleTime.
-     */
-    @ExceptionHandler(ScheduleExceptions.InvalidScheduleTimeException.class)
+        @ExceptionHandler(ScheduleExceptions.InvalidScheduleTimeException.class)
     public ResponseEntity<Map<String, String>> handleInvalidScheduleTime(
             ScheduleExceptions.InvalidScheduleTimeException ex) {
         Map<String, String> error = new HashMap<>();

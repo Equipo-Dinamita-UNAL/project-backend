@@ -21,9 +21,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
-/**
- * Define el contrato publico de UserService.
- */
 @Service
 public class UserService {
 
@@ -32,10 +29,7 @@ public class UserService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
 
-    /**
-     * Ejecuta la operacion publica UserService.
-     */
-    public UserService(UserRepository userRepository, AdministratorRepository administratorRepository,
+        public UserService(UserRepository userRepository, AdministratorRepository administratorRepository,
                        PatientRepository patientRepository, DoctorRepository doctorRepository) {
 
         this.userRepository = userRepository;
@@ -44,13 +38,10 @@ public class UserService {
         this.doctorRepository = doctorRepository;
     }
 
-    /**
-     * Ejecuta la operacion publica createUser.
-     */
-    public UsuarioCreadoResponse createUser(CrearUsuarioRequest request) {
+        public UsuarioCreadoResponse createUser(CrearUsuarioRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El email ya estÃ¡ registrado");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El email ya está registrado");
         }
 
         User user = buildUser(request);
@@ -128,10 +119,7 @@ public class UserService {
         return response;
     }
 
-    /**
-     * Ejecuta la operacion publica deleteUser.
-     */
-    public DeleteUserResponse deleteUser(DeleteUserRequest request){
+        public DeleteUserResponse deleteUser(DeleteUserRequest request){
         DeleteUserResponse response = new DeleteUserResponse();
 
         User user = userRepository.findByEmail(request.getEmail());
@@ -139,7 +127,7 @@ public class UserService {
         if(user == null){
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
-                    "Correo no asociado con ningÃºn usuario."
+                    "Correo no asociado con ningún usuario."
             );
         }
 

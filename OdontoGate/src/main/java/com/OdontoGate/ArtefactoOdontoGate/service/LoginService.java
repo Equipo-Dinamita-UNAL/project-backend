@@ -21,9 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 
-/**
- * Define el contrato publico de LoginService.
- */
 @Service
 public class LoginService {
 
@@ -32,10 +29,7 @@ public class LoginService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
 
-    /**
-     * Ejecuta la operacion publica LoginService.
-     */
-    public LoginService(UserRepository userRepository, AdministratorRepository administratorRepository,
+        public LoginService(UserRepository userRepository, AdministratorRepository administratorRepository,
                         PatientRepository patientRepository, DoctorRepository doctorRepository) {
 
         this.userRepository = userRepository;
@@ -44,10 +38,7 @@ public class LoginService {
         this.doctorRepository = doctorRepository;
     }
 
-    /**
-     * Ejecuta la operacion publica login.
-     */
-    public LoginResponse login(LoginRequest request){
+        public LoginResponse login(LoginRequest request){
 
         LoginResponse response = new LoginResponse();
 
@@ -93,10 +84,7 @@ public class LoginService {
         }
     }
 
-    /**
-     * Ejecuta la operacion publica changePassword.
-     */
-    public ChangePasswordResponse changePassword(ChangePasswordRequest request){
+        public ChangePasswordResponse changePassword(ChangePasswordRequest request){
         ChangePasswordResponse response = new ChangePasswordResponse();
 
         User user = userRepository.findByEmail(request.getEmail());

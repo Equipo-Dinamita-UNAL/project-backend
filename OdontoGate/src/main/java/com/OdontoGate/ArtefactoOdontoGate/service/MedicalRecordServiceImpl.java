@@ -8,25 +8,16 @@ import com.OdontoGate.ArtefactoOdontoGate.repository.MedicalRecordRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
-/**
- * Define el contrato publico de MedicalRecordServiceImpl.
- */
 @Service
 public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     private final MedicalRecordRepository repository;
 
-    /**
-     * Ejecuta la operacion publica MedicalRecordServiceImpl.
-     */
-    public MedicalRecordServiceImpl(MedicalRecordRepository repository) {
+        public MedicalRecordServiceImpl(MedicalRecordRepository repository) {
         this.repository = repository;
     }
 
-    /**
-     * Ejecuta la operacion publica create.
-     */
-    @Override
+        @Override
     public MedicalRecordResponse create(MedicalRecordRequest request) {
         MedicalRecord medicalRecord = new MedicalRecord();
         medicalRecord.setPatientId(request.getPatientId());
@@ -37,10 +28,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         return toResponse(repository.save(medicalRecord));
     }
 
-    /**
-     * Ejecuta la operacion publica update.
-     */
-    @Override
+        @Override
     public MedicalRecordResponse update(Integer id, MedicalRecordRequest request) {
         MedicalRecord medicalRecord = repository.findById(id)
                 .orElseThrow(() -> new MedicalRecordExceptions.NotFoundException(id));
@@ -51,20 +39,14 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         return toResponse(repository.save(medicalRecord));
     }
 
-    /**
-     * Ejecuta la operacion publica findById.
-     */
-    @Override
+        @Override
     public MedicalRecordResponse findById(Integer id) {
         MedicalRecord medicalRecord = repository.findById(id)
                 .orElseThrow(() -> new MedicalRecordExceptions.NotFoundException(id));
         return toResponse(medicalRecord);
     }
 
-    /**
-     * Ejecuta la operacion publica findByPatient.
-     */
-    @Override
+        @Override
     public List<MedicalRecordResponse> findByPatient(Integer patientId) {
         return repository.findByPatientId(patientId)
                 .stream()
@@ -72,10 +54,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
                 .toList();
     }
 
-    /**
-     * Ejecuta la operacion publica delete.
-     */
-    @Override
+        @Override
     public void delete(Integer id) {
         if (!repository.existsById(id)) {
             throw new MedicalRecordExceptions.NotFoundException(id);

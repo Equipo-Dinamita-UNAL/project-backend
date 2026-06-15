@@ -11,9 +11,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 
-/**
- * Define el contrato publico de Patient.
- */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity

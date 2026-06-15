@@ -2,8 +2,11 @@ package com.OdontoGate.ArtefactoOdontoGate.controller;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Request.MedicalRecordRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses.MedicalRecordResponse;
+import com.OdontoGate.ArtefactoOdontoGate.dto.validation.OnCreate;
 import com.OdontoGate.ArtefactoOdontoGate.service.MedicalRecordService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,63 +18,42 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
-/**
- * Define el contrato publico de MedicalRecordController.
- */
 @RestController
 @RequestMapping("/api/medical-records")
 public class MedicalRecordController {
 
     private final MedicalRecordService service;
 
-    /**
-     * Ejecuta la operacion publica MedicalRecordController.
-     */
-    public MedicalRecordController(MedicalRecordService service) {
+        public MedicalRecordController(MedicalRecordService service) {
         this.service = service;
     }
 
-    /**
-     * Ejecuta la operacion publica create.
-     */
-    @PostMapping
+        @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public MedicalRecordResponse create(
-            @RequestBody MedicalRecordRequest request) {
+            @Validated(OnCreate.class) @RequestBody MedicalRecordRequest request) {
         return service.create(request);
     }
 
-    /**
-     * Ejecuta la operacion publica update.
-     */
-    @PutMapping("/{id}")
+        @PutMapping("/{id}")
     public MedicalRecordResponse update(
             @PathVariable Integer id,
-            @RequestBody MedicalRecordRequest request) {
+            @Valid @RequestBody MedicalRecordRequest request) {
         return service.update(id, request);
     }
 
-    /**
-     * Ejecuta la operacion publica findById.
-     */
-    @GetMapping("/{id}")
+        @GetMapping("/{id}")
     public MedicalRecordResponse findById(@PathVariable Integer id) {
         return service.findById(id);
     }
 
-    /**
-     * Ejecuta la operacion publica findByPatient.
-     */
-    @GetMapping("/patient/{patientId}")
+        @GetMapping("/patient/{patientId}")
     public List<MedicalRecordResponse> findByPatient(
             @PathVariable Integer patientId) {
         return service.findByPatient(patientId);
     }
 
-    /**
-     * Ejecuta la operacion publica delete.
-     */
-    @DeleteMapping("/{id}")
+        @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Integer id) {
         service.delete(id);

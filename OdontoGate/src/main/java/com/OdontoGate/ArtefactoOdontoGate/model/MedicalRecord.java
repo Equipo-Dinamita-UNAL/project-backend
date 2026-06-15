@@ -10,9 +10,6 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
-/**
- * Define el contrato publico de MedicalRecord.
- */
 @Data
 @Entity
 @Table(name = "medical_record")

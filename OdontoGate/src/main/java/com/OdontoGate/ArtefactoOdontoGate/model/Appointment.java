@@ -14,9 +14,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-/**
- * Define el contrato publico de Appointment.
- */
 @Data
 @Entity
 @Table(name = "appointment")
