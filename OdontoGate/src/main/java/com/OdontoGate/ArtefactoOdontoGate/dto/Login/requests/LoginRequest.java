@@ -1,12 +1,15 @@
 package com.OdontoGate.ArtefactoOdontoGate.dto.Login.requests;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-/**
- * Define el contrato publico de LoginRequest.
- */
 @Data
 public class LoginRequest {
+    @NotBlank
+    @Email
     private String email;
+
+    @NotBlank
     private String password;
 }

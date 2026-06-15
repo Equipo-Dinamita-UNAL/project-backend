@@ -11,9 +11,6 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import java.time.LocalTime;
 
-/**
- * Define el contrato publico de Schedule.
- */
 @Data
 @Entity
 @Table(name = "schedule")

@@ -11,9 +11,6 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import java.time.LocalDateTime;
 
-/**
- * Define el contrato publico de User.
- */
 @Data
 @Entity
 @Table(name = "\"user\"")

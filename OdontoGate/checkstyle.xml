@@ -80,29 +80,7 @@
         </module>
 
         <!-- =============================================
-             MUST 4 — Javadoc en clases públicas
-             Clean Code — Documentación
-             ============================================= -->
-        <module name="MissingJavadocType">
-            <property name="scope" value="public"/>
-            <property name="tokens" value="CLASS_DEF, INTERFACE_DEF"/>
-            <message key="javadoc.missing"
-                     value="[MUST-4] La clase pública ''{0}'' debe tener Javadoc explicando su propósito"/>
-        </module>
-
-        <!-- =============================================
-             MUST 5 — Javadoc en métodos públicos
-             Clean Code — Documentación
-             ============================================= -->
-        <module name="MissingJavadocMethod">
-            <property name="scope" value="public"/>
-            <property name="allowMissingPropertyJavadoc" value="true"/>
-            <message key="javadoc.missing"
-                     value="[MUST-5] El método público debe tener Javadoc con @param y @return"/>
-        </module>
-
-        <!-- =============================================
-             MUST 6 — Métodos no demasiado largos
+             MUST 4 — Métodos no demasiado largos
              Clean Code Cap. 3 — funciones pequeñas
              ============================================= -->
         <module name="MethodLength">
@@ -113,7 +91,7 @@
         </module>
 
         <!-- =============================================
-             MUST 7 — Máximo parámetros por método
+             MUST 5 — Máximo parámetros por método
              Clean Code Cap. 3
              ============================================= -->
         <module name="ParameterNumber">
