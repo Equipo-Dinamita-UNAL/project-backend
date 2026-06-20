@@ -2,11 +2,13 @@ package com.OdontoGate.ArtefactoOdontoGate.service;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.requests.CrearUsuarioRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses.UsuarioCreadoResponse;
+import com.OdontoGate.ArtefactoOdontoGate.model.Role;
 import com.OdontoGate.ArtefactoOdontoGate.model.User;
 import com.OdontoGate.ArtefactoOdontoGate.model.UserType;
 import com.OdontoGate.ArtefactoOdontoGate.repository.AdministratorRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.DoctorRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.PatientRepository;
+import com.OdontoGate.ArtefactoOdontoGate.repository.RoleRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.UserRepository;
 
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +41,9 @@ class UserServiceCreateTest {
     @Mock
     private DoctorRepository doctorRepository;
 
+    @Mock
+    private RoleRepository roleRepository;
+
     @InjectMocks
     private UserService userService;
 
@@ -54,6 +61,7 @@ class UserServiceCreateTest {
         request.setPhotoUrl("photo.jpg");
 
         when(userRepository.existsByEmail("doctor@test.com")).thenReturn(false);
+        when(roleRepository.findByNombre("doctor")).thenReturn(Optional.of(buildRole("doctor")));
 
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
             User user = invocation.getArgument(0);
@@ -89,6 +97,7 @@ class UserServiceCreateTest {
         request.setAddress("Calle 123");
 
         when(userRepository.existsByEmail("patient@test.com")).thenReturn(false);
+        when(roleRepository.findByNombre("patient")).thenReturn(Optional.of(buildRole("patient")));
 
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
             User user = invocation.getArgument(0);
@@ -125,5 +134,12 @@ class UserServiceCreateTest {
         assertEquals("El email ya está registrado", exception.getReason());
 
         verify(userRepository, never()).save(any(User.class));
+    }
+
+    private Role buildRole(String name) {
+        Role role = new Role();
+        role.setId(1);
+        role.setNombre(name);
+        return role;
     }
 }

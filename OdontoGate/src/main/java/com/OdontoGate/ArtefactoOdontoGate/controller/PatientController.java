@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,12 +28,14 @@ public class PatientController {
     private final AppointmentService appointmentService;
 
     @GetMapping("/{patientId}/appointments")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('PATIENT_LEER_CITA')")
     public ResponseEntity<List<AppointmentResponse>> getAppointments(
             @PathVariable Integer patientId) {
         return ResponseEntity.ok(appointmentService.getByPatient(patientId));
     }
 
     @PostMapping("/{patientId}/doctors/{doctorId}/appointments")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('PATIENT_CREAR_CITA')")
     public ResponseEntity<AppointmentResponse> createAppointment(
             @PathVariable Integer patientId,
             @PathVariable Integer doctorId,
@@ -54,6 +57,7 @@ public class PatientController {
     }
 
     @DeleteMapping("/{patientId}/appointments/{appointmentId}")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('PATIENT_ELIMINAR_CITA')")
     public ResponseEntity<Void> deleteAppointment(
             @PathVariable Integer patientId,
             @PathVariable Integer appointmentId) {

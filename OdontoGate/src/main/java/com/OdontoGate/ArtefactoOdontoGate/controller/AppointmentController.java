@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/appointments")
@@ -27,6 +28,7 @@ public class AppointmentController {
 
     // PUT /api/appointments/1
         @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('PATIENT_MODIFICAR_CITA')")
     public ResponseEntity<AppointmentResponse> update(
             @PathVariable Integer id,
             @Valid @RequestBody AppointmentUpdateRequest request) {
@@ -35,30 +37,35 @@ public class AppointmentController {
 
     // PATCH /api/appointments/1/cancel
         @PatchMapping("/{id}/cancel")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('PATIENT_MODIFICAR_CITA')")
     public ResponseEntity<AppointmentResponse> cancel(@PathVariable Integer id) {
         return ResponseEntity.ok(appointmentService.cancel(id));
     }
 
     // GET /api/appointments
         @GetMapping
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('DOCTOR_VER_CITAS_AGENDADAS')")
     public ResponseEntity<List<AppointmentResponse>> getAll() {
         return ResponseEntity.ok(appointmentService.getAll());
     }
 
     // GET /api/appointments/patient/1
         @GetMapping("/patient/{patientId}")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('PATIENT_LEER_CITA')")
     public ResponseEntity<List<AppointmentResponse>> getByPatient(@PathVariable Integer patientId) {
         return ResponseEntity.ok(appointmentService.getByPatient(patientId));
     }
 
     // GET /api/appointments/doctor/1
         @GetMapping("/doctor/{doctorId}")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('DOCTOR_VER_CITAS_AGENDADAS')")
     public ResponseEntity<List<AppointmentResponse>> getByDoctor(@PathVariable Integer doctorId) {
         return ResponseEntity.ok(appointmentService.getByDoctor(doctorId));
     }
 
     // POST /api/appointments
         @PostMapping
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('PATIENT_CREAR_CITA')")
     public ResponseEntity<AppointmentResponse> create(
             @Valid @RequestBody AppointmentRequest request) {
         return ResponseEntity.ok(appointmentService.create(request));
@@ -66,6 +73,7 @@ public class AppointmentController {
 
     // DELETE /api/appointments/1
         @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('PATIENT_ELIMINAR_CITA')")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         appointmentService.delete(id);
         return ResponseEntity.noContent().build();

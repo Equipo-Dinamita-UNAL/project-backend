@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/medical-records")
@@ -30,12 +31,14 @@ public class MedicalRecordController {
 
         @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('DOCTOR_CREAR_HISTORIA_CLINICA')")
     public MedicalRecordResponse create(
             @Validated(OnCreate.class) @RequestBody MedicalRecordRequest request) {
         return service.create(request);
     }
 
         @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('DOCTOR_MODIFICAR_HISTORIA_CLINICA')")
     public MedicalRecordResponse update(
             @PathVariable Integer id,
             @Valid @RequestBody MedicalRecordRequest request) {
@@ -43,11 +46,13 @@ public class MedicalRecordController {
     }
 
         @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('DOCTOR_LEER_HISTORIA_CLINICA')")
     public MedicalRecordResponse findById(@PathVariable Integer id) {
         return service.findById(id);
     }
 
         @GetMapping("/patient/{patientId}")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('DOCTOR_LEER_HISTORIA_CLINICA')")
     public List<MedicalRecordResponse> findByPatient(
             @PathVariable Integer patientId) {
         return service.findByPatient(patientId);
@@ -55,6 +60,7 @@ public class MedicalRecordController {
 
         @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public void delete(@PathVariable Integer id) {
         service.delete(id);
     }
