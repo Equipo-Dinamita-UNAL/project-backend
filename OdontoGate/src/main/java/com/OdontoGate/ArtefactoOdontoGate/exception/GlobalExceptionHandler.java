@@ -146,4 +146,15 @@ public class GlobalExceptionHandler {
         error.put(ERROR_KEY, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+
+    @ExceptionHandler(MercadoPagoIntegrationException.class)
+    public ResponseEntity<Map<String, String>> handleMercadoPagoException(MercadoPagoIntegrationException ex) {
+        Map<String, String> response = new HashMap<>();
+
+        response.put(ERROR_KEY, "Error en la pasarela de pagos");
+        response.put("message", ex.getMessage());
+
+        // Retorna un HTTP 503 (Service Unavailable)
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+    }
 }

@@ -33,9 +33,10 @@ public class PaymentService {
     // 👈 2. Inyectamos el TreatmentRepository para verificar precios reales en DB
     private final TreatmentRepository treatmentRepository;
 
-
+    private final PaymentGateway paymentGateway;
 
     // Crear pago
+    @Transactional
     public PaymentResponse createPayment(PaymentRequest request) {
 
 
@@ -63,14 +64,24 @@ public class PaymentService {
         // 4. Crear el pago usando el valor real verificado en DB
         Payment payment = new Payment();
         payment.setAppointment(appointment);
-
         payment.setAmount(montoCorrectoBd); // 👈 Forzamos que se guarde el precio legal
-
         payment.setMethod(request.getMethod());
         payment.setStatus("PENDIENTE");
         payment.setCreatedAt(LocalDateTime.now());
 
-        return mapToResponse(paymentRepository.save(payment));
+        Payment savedPayment = paymentRepository.save(payment);
+
+        // Llamamos al metodo de la interfaz. ¡PaymentService no sabe que es Mercado Pago!
+        String urlCheckout = paymentGateway.generateCheckoutUrl(
+                savedPayment.getId().toString(),
+                montoCorrectoBd,
+                "Cita odontológica"
+        );
+
+        PaymentResponse response = mapToResponse(savedPayment);
+        response.setCheckoutUrl(urlCheckout);
+
+        return response;
     }
 
     // Ver pagos por paciente
