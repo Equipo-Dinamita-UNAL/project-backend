@@ -21,4 +21,4 @@ jwt:
   expiration-minutes: 120
 
 mercadopago:
-  access-token: "APP_USR-7135169178835509-062022-598b2a2769b5c9109f11e607ec2e2448-3486811779"
+  access-token: "APP_USR-xxxxxxxxxxxx-xxxxxx-xxxxxxxzxxxxxxxxxxxxxx-xxxxxxxxxx"
