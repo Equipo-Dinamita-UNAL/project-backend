@@ -2,12 +2,14 @@ package com.OdontoGate.ArtefactoOdontoGate.service;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.request.ReceiptRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.response.ReceiptResponse;
+import com.OdontoGate.ArtefactoOdontoGate.event.PaymentApprovedEvent;
 import com.OdontoGate.ArtefactoOdontoGate.exception.ReceiptExceptions;
 import com.OdontoGate.ArtefactoOdontoGate.model.Payment;
 import com.OdontoGate.ArtefactoOdontoGate.model.Receipt;
 import com.OdontoGate.ArtefactoOdontoGate.repository.PaymentRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.ReceiptRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -57,6 +59,15 @@ public class ReceiptService {
         Receipt receipt = receiptRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Comprobante no encontrado"));
         return mapToResponse(receipt);
+    }
+
+    // Este metodo se dispara SOLO cuando alguien publica un PaymentApprovedEvent
+    @EventListener
+    public void handlePaymentApproved(PaymentApprovedEvent event) {
+        ReceiptRequest receiptReq = new ReceiptRequest();
+        receiptReq.setPaymentId(event.getPaymentId());
+        receiptReq.setType("ELECTRONICO");
+        this.createReceipt(receiptReq);
     }
 
     // Mapeo

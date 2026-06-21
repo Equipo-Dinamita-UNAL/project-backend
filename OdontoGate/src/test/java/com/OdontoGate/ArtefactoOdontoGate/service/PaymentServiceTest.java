@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
+
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +35,6 @@ class PaymentServiceTest {
 
         PaymentRequest request = new PaymentRequest();
         request.setAppointmentId(1);
-        request.setAmount(new BigDecimal("50000"));
         request.setMethod("EFECTIVO");
 
         Appointment appointment = new Appointment();
@@ -64,7 +63,6 @@ class PaymentServiceTest {
 
         PaymentRequest request = new PaymentRequest();
         request.setAppointmentId(99);
-        request.setAmount(new BigDecimal("50000"));
         request.setMethod("EFECTIVO");
 
 
@@ -78,20 +76,6 @@ class PaymentServiceTest {
         assertEquals("Cita no encontrada con id: 99", ex.getMessage());
     }
 
-    @Test
-    void cuandoMontoEsNegativo_debeLanzarExcepcion() {
 
-        // 1. Preparar datos
-        PaymentRequest request = new PaymentRequest();
-        request.setAppointmentId(1);
-        request.setAmount(new BigDecimal("-50000"));
-        request.setMethod("EFECTIVO");
-
-        // 2. Ejecutar y verificar
-        RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> paymentService.createPayment(request));
-
-        assertEquals("El monto no puede ser negativo", ex.getMessage());
-    }
 
 }
