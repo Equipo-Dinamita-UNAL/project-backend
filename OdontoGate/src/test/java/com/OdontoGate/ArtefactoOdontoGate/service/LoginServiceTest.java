@@ -8,6 +8,7 @@ import com.OdontoGate.ArtefactoOdontoGate.repository.AdministratorRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.DoctorRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.PatientRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.UserRepository;
+import com.OdontoGate.ArtefactoOdontoGate.security.JwtService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +36,9 @@ class LoginServiceTest {
     @Mock
     private DoctorRepository doctorRepository;
 
+    @Mock
+    private JwtService jwtService;
+
     @InjectMocks
     private LoginService loginService;
 
@@ -54,11 +58,13 @@ class LoginServiceTest {
 
         when(administratorRepository.existsById(1)).thenReturn(false);
         when(doctorRepository.existsById(1)).thenReturn(true);
+        when(jwtService.generateToken(user)).thenReturn("jwt-token");
 
         LoginResponse response = loginService.login(request);
 
         assertNotNull(response);
         assertEquals(UserType.DOCTOR, response.getUserType());
+        assertEquals("jwt-token", response.getToken());
 
         verify(patientRepository, never()).existsById(1);
     }
@@ -80,11 +86,13 @@ class LoginServiceTest {
         when(administratorRepository.existsById(2)).thenReturn(false);
         when(doctorRepository.existsById(2)).thenReturn(false);
         when(patientRepository.existsById(2)).thenReturn(true);
+        when(jwtService.generateToken(user)).thenReturn("jwt-token");
 
         LoginResponse response = loginService.login(request);
 
         assertNotNull(response);
         assertEquals(UserType.PATIENT, response.getUserType());
+        assertEquals("jwt-token", response.getToken());
     }
 
     @Test

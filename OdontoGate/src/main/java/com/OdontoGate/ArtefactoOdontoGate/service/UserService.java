@@ -8,12 +8,15 @@ import com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses.UsuarioCreadoRespo
 import com.OdontoGate.ArtefactoOdontoGate.model.Administrator;
 import com.OdontoGate.ArtefactoOdontoGate.model.Doctor;
 import com.OdontoGate.ArtefactoOdontoGate.model.Patient;
+import com.OdontoGate.ArtefactoOdontoGate.model.Role;
 import com.OdontoGate.ArtefactoOdontoGate.model.User;
+import com.OdontoGate.ArtefactoOdontoGate.model.UserType;
 
 import com.OdontoGate.ArtefactoOdontoGate.repository.UserRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.AdministratorRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.PatientRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.DoctorRepository;
+import com.OdontoGate.ArtefactoOdontoGate.repository.RoleRepository;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,14 +31,17 @@ public class UserService {
     private final AdministratorRepository administratorRepository;
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
+    private final RoleRepository roleRepository;
 
         public UserService(UserRepository userRepository, AdministratorRepository administratorRepository,
-                       PatientRepository patientRepository, DoctorRepository doctorRepository) {
+                       PatientRepository patientRepository, DoctorRepository doctorRepository,
+                       RoleRepository roleRepository) {
 
         this.userRepository = userRepository;
         this.administratorRepository = administratorRepository;
         this.patientRepository = patientRepository;
         this.doctorRepository = doctorRepository;
+        this.roleRepository = roleRepository;
     }
 
         public UsuarioCreadoResponse createUser(CrearUsuarioRequest request) {
@@ -101,6 +107,24 @@ public class UserService {
         user.setPhone(request.getPhone());
         user.setActive(true);
         user.setCreatedAt(LocalDateTime.now());
+        user.setRole(findRole(request.getUserType()));
+    }
+
+    private Role findRole(UserType userType) {
+        String roleName = getRoleName(userType);
+
+        return roleRepository.findByNombre(roleName)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Rol no configurado en base de datos: " + roleName));
+    }
+
+    private String getRoleName(UserType userType) {
+        return switch (userType) {
+            case ADMINISTRATOR -> "administrator";
+            case DOCTOR -> "doctor";
+            case PATIENT -> "patient";
+        };
     }
 
     private UsuarioCreadoResponse buildCreatedUserResponse(
