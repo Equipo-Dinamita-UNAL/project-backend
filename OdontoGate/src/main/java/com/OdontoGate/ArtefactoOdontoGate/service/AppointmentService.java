@@ -8,14 +8,16 @@ import com.OdontoGate.ArtefactoOdontoGate.model.Doctor;
 import com.OdontoGate.ArtefactoOdontoGate.model.Patient;
 import com.OdontoGate.ArtefactoOdontoGate.model.Schedule;
 import com.OdontoGate.ArtefactoOdontoGate.model.User;
+import com.OdontoGate.ArtefactoOdontoGate.model.Treatment;
 import com.OdontoGate.ArtefactoOdontoGate.repository.AppointmentRepository;
 import com.OdontoGate.ArtefactoOdontoGate.dto.request.AppointmentUpdateRequest;
 import com.OdontoGate.ArtefactoOdontoGate.repository.PatientRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.DoctorRepository;
+import com.OdontoGate.ArtefactoOdontoGate.repository.ScheduleRepository;
+import com.OdontoGate.ArtefactoOdontoGate.repository.TreatmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import com.OdontoGate.ArtefactoOdontoGate.repository.ScheduleRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -28,8 +30,11 @@ public class AppointmentService {
     private final DoctorRepository doctorRepository;
     private final ScheduleRepository scheduleRepository;
 
+    // 1. REPOSITORIO DE TRATAMIENTOS INYECTADO AUTOMÁTICAMENTE POR LOMBOK 🚀
+    private final TreatmentRepository treatmentRepository;
+
     // Crear cita
-        public AppointmentResponse create(AppointmentRequest request) {
+    public AppointmentResponse create(AppointmentRequest request) {
         Appointment appointment = new Appointment();
         appointment.setDate(request.getDate());
         appointment.setTime(request.getTime());
@@ -68,7 +73,7 @@ public class AppointmentService {
     }
 
     // Obtener todas las citas
-        public List<AppointmentResponse> getAll() {
+    public List<AppointmentResponse> getAll() {
         return appointmentRepository.findAll()
                 .stream()
                 .map(this::toResponse)
@@ -76,7 +81,7 @@ public class AppointmentService {
     }
 
     // Obtener citas de un paciente
-        public List<AppointmentResponse> getByPatient(Integer patientId) {
+    public List<AppointmentResponse> getByPatient(Integer patientId) {
         return appointmentRepository.findByPatientId(patientId)
                 .stream()
                 .map(this::toResponse)
@@ -84,7 +89,7 @@ public class AppointmentService {
     }
 
     // Obtener citas de un doctor
-        public List<AppointmentResponse> getByDoctor(Integer doctorId) {
+    public List<AppointmentResponse> getByDoctor(Integer doctorId) {
         return appointmentRepository.findByDoctorId(doctorId)
                 .stream()
                 .map(this::toResponse)
@@ -92,12 +97,12 @@ public class AppointmentService {
     }
 
     // Eliminar cita
-        public void delete(Integer id) {
+    public void delete(Integer id) {
         appointmentRepository.deleteById(id);
     }
 
     // Modificar cita
-        public AppointmentResponse update(Integer id, AppointmentUpdateRequest request) {
+    public AppointmentResponse update(Integer id, AppointmentUpdateRequest request) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
@@ -132,7 +137,7 @@ public class AppointmentService {
     }
 
     // Cancelar cita
-        public AppointmentResponse cancel(Integer id) {
+    public AppointmentResponse cancel(Integer id) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
@@ -172,6 +177,18 @@ public class AppointmentService {
         }
     }
 
+    // 2. CÁLCULO DINÁMICO DESDE LA BASE DE DATOS (MÉTODO MEJORADO) 🚀
+    private Double calculatePriceByReason(String reason) {
+        if (reason == null) {
+            return 70000.00; // Tarifa básica por defecto si la cita no tiene motivo
+        }
+
+        // Busca el nombre en la tabla 'treatment'. Si existe extrae su precio, si no, usa la tarifa base.
+        return treatmentRepository.findByName(reason.trim())
+                .map(Treatment::getPrice)
+                .orElse(70000.00);
+    }
+
     // Convertir entidad a Response
     private AppointmentResponse toResponse(Appointment appointment) {
         AppointmentResponse response = new AppointmentResponse();
@@ -188,6 +205,10 @@ public class AppointmentService {
                 appointment.getDoctor().getName() + " " +
                         appointment.getDoctor().getLastname()
         );
+
+        // ASIGNACIÓN DE PRECIO AUTOMÁTICO DINÁMICO ✅
+        response.setPrice(calculatePriceByReason(appointment.getReason()));
+
         return response;
     }
 }
