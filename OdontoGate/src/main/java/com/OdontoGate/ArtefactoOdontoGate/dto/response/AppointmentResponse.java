@@ -14,4 +14,5 @@ public class AppointmentResponse {
     private LocalTime time;
     private String status;
     private String reason;
+    private Double price;
 }
