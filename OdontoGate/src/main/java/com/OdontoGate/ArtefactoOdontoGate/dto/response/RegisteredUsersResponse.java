@@ -12,4 +12,5 @@ public class RegisteredUsersResponse {
 
     private List<PatientSummaryResponse> patients;
     private List<DoctorSummaryResponse> doctors;
+    private List<AdministratorSummaryResponse> administrators;
 }
