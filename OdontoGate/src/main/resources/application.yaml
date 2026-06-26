@@ -24,4 +24,12 @@ server:
 
 jwt:
   secret: "T2RvbnRvR2F0ZV9qd3Rfc2VjcmV0X2tleV9wYXJhX2htYWMtczI1Nl8yMDI2"
+<<<<<<< HEAD
   expiration-minutes: 120
+=======
+  expiration-minutes: 120
+
+mercadopago:
+  access-token: "APP_USR-7426774784956572-062221-e1e7c4daaf0f7bd8305914207256be3f-3492860872"
+
+>>>>>>> 035b10f29ab68d8085dca60acb95ec26e1643a45

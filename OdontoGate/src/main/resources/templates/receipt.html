@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Comprobante de Pago</title>
+    <style>
+        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #333; margin: 40px; }
+        .header { text-align: center; border-bottom: 2px solid #2c3e50; padding-bottom: 15px; margin-bottom: 30px; }
+        .header h1 { color: #2c3e50; margin: 0; font-size: 24px; }
+        .header p { color: #7f8c8d; margin: 5px 0 0 0; }
+        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .info-table th, .info-table td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+        .info-table th { background-color: #f8f9fa; color: #2c3e50; width: 40%; font-weight: bold; }
+        .amount-row th, .amount-row td { background-color: #e8f4f8; font-size: 18px; font-weight: bold; color: #2980b9; }
+        .footer { text-align: center; font-size: 12px; color: #95a5a6; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Comprobante de Pago Médico</h1>
+    <p>Número de Recibo: <span th:text="${receipt.receiptNumber}">REC-000000</span></p>
+    <p>Fecha de Emisión: <span th:text="${#temporals.format(receipt.issueDate, 'dd/MM/yyyy HH:mm')}">01/01/2026 12:00</span></p>
+</div>
+
+<table class="info-table">
+    <tr>
+        <th>Paciente:</th>
+        <td th:text="${receipt.patientName + ' ' + receipt.patientLastname}">Juan Pérez</td>
+    </tr>
+    <tr>
+        <th>Doctor(a) Atendido:</th>
+        <td th:text="${'Dr/Dra. ' + receipt.doctorName + ' ' + receipt.doctorLastname}">Dr. Smith</td>
+    </tr>
+    <tr>
+        <th>Motivo de Tratamiento:</th>
+        <td th:text="${receipt.treatmentReason}">Consulta General</td>
+    </tr>
+    <tr>
+        <th>Tipo de Recibo:</th>
+        <td th:text="${receipt.type}">ELECTRONICO</td>
+    </tr>
+    <tr>
+        <th>Método de Pago:</th>
+        <td th:text="${receipt.paymentMethod}">Tarjeta</td>
+    </tr>
+    <tr th:if="${receipt.gatewayReference != null}">
+        <th>Ref. Transacción:</th>
+        <td th:text="${receipt.gatewayReference}">MP-123456</td>
+    </tr>
+    <tr class="amount-row">
+        <th>Total Pagado:</th>
+        <td th:text="${'$ ' + receipt.amount}">$ 0.00</td>
+    </tr>
+</table>
+
+<div class="footer">
+    <p>Este documento es un comprobante de pago válido.</p>
+    <p>Gracias por confiar en nuestros servicios de salud.</p>
+</div>
+
+</body>
+</html>

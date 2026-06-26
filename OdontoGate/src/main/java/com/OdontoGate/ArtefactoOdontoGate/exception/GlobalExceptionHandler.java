@@ -36,6 +36,7 @@ public class GlobalExceptionHandler {
 
         @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneric(Exception ex) {
+            ex.printStackTrace();  // ← agrega esta línea
 
         Map<String, String> error = new HashMap<>();
         error.put(ERROR_KEY, "Error interno del servidor");
@@ -146,6 +147,7 @@ public class GlobalExceptionHandler {
         error.put(ERROR_KEY, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+<<<<<<< HEAD
     @ExceptionHandler(MaxUploadSizeExceededException.class)
 public ResponseEntity<Map<String, String>> handleMaxUploadSize(
         MaxUploadSizeExceededException ex) {
@@ -194,4 +196,17 @@ public ResponseEntity<Map<String, String>> handleDocumentNotOwner(
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
 }
     
+=======
+
+    @ExceptionHandler(MercadoPagoIntegrationException.class)
+    public ResponseEntity<Map<String, String>> handleMercadoPagoException(MercadoPagoIntegrationException ex) {
+        Map<String, String> response = new HashMap<>();
+
+        response.put(ERROR_KEY, "Error en la pasarela de pagos");
+        response.put("message", ex.getMessage());
+
+        // Retorna un HTTP 503 (Service Unavailable)
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+    }
+>>>>>>> 035b10f29ab68d8085dca60acb95ec26e1643a45
 }

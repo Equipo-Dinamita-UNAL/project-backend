@@ -15,4 +15,5 @@ public class PaymentResponse {
     private LocalDateTime createdAt;
     private String patientName;
     private String patientLastname;
+    private String checkoutUrl;
 }
