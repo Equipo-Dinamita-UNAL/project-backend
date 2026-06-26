@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -21,12 +22,20 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    // Crear un pago -POST
-    @PreAuthorize("hasAnyRole('ADMINISTRATOR', 'PATIENT')")
-    @PostMapping
-    public ResponseEntity<PaymentResponse> createPayment(
+    // Pago virtual - el paciente inicia su propio pago
+    @PreAuthorize("hasRole('PATIENT')")
+    @PostMapping("/virtual")
+    public ResponseEntity<PaymentResponse> createVirtualPayment(
             @Valid @RequestBody PaymentRequest request) {
-        return ResponseEntity.status(201).body(paymentService.createPayment(request));
+        return ResponseEntity.status(201).body(paymentService.createVirtualPayment(request));
+    }
+
+    // Pago presencial - el admin registra un pago ya recibido en el consultorio
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @PostMapping("/presencial")
+    public ResponseEntity<PaymentResponse> createPresentialPayment(
+            @Valid @RequestBody PaymentRequest request) {
+        return ResponseEntity.status(201).body(paymentService.createPresentialPayment(request));
     }
 
     // Ver pagos por paciente (navegando por appointment) - GET
@@ -73,5 +82,12 @@ public class PaymentController {
     public ResponseEntity<PaymentResponse> updateStatus(@PathVariable Integer id, @RequestBody String status) {
         return ResponseEntity.ok(paymentService.updateStatus(id, status));
     }
+
+    @PostMapping("/webhook")
+    public ResponseEntity<Void> receiveWebhook(@RequestBody Map<String, Object> body) {
+        paymentService.processWebhook(body);
+        return ResponseEntity.ok().build();
+    }
+
 
 }
