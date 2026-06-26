@@ -1,10 +1,13 @@
 package com.OdontoGate.ArtefactoOdontoGate.service;
 
+import com.OdontoGate.ArtefactoOdontoGate.dto.response.AdministratorSummaryResponse;
 import com.OdontoGate.ArtefactoOdontoGate.dto.response.DoctorSummaryResponse;
 import com.OdontoGate.ArtefactoOdontoGate.dto.response.PatientSummaryResponse;
 import com.OdontoGate.ArtefactoOdontoGate.dto.response.RegisteredUsersResponse;
+import com.OdontoGate.ArtefactoOdontoGate.model.Administrator;
 import com.OdontoGate.ArtefactoOdontoGate.model.Doctor;
 import com.OdontoGate.ArtefactoOdontoGate.model.Patient;
+import com.OdontoGate.ArtefactoOdontoGate.repository.AdministratorRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.DoctorRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.PatientRepository;
 import java.util.List;
@@ -17,47 +20,93 @@ public class AdminService {
 
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
+    private final AdministratorRepository administratorRepository;
 
-    public RegisteredUsersResponse getRegisteredPatientsAndDoctors() {
-        List<PatientSummaryResponse> patients = patientRepository.findAll()
-                .stream()
-                .map(this::toPatientSummaryResponse)
-                .toList();
+    public RegisteredUsersResponse getRegisteredUsers() {
+        List<PatientSummaryResponse> patients = getRegisteredPatients();
+        List<DoctorSummaryResponse> doctors = getRegisteredDoctors();
+        List<AdministratorSummaryResponse> administrators = getRegisteredAdministrators();
 
-        List<DoctorSummaryResponse> doctors = doctorRepository.findAll()
-                .stream()
-                .map(this::toDoctorSummaryResponse)
-                .toList();
-
-        return new RegisteredUsersResponse(patients, doctors);
+        return new RegisteredUsersResponse(patients, doctors, administrators);
     }
 
-    public RegisteredUsersResponse getActiveRegisteredPatientsAndDoctors() {
-        List<PatientSummaryResponse> patients = patientRepository.findByActiveTrue()
+    public List<PatientSummaryResponse> getRegisteredPatients() {
+        return patientRepository.findAll()
                 .stream()
                 .map(this::toPatientSummaryResponse)
                 .toList();
-
-        List<DoctorSummaryResponse> doctors = doctorRepository.findByActiveTrue()
-                .stream()
-                .map(this::toDoctorSummaryResponse)
-                .toList();
-
-        return new RegisteredUsersResponse(patients, doctors);
     }
 
-    public RegisteredUsersResponse getInactiveRegisteredPatientsAndDoctors() {
-        List<PatientSummaryResponse> patients = patientRepository.findByActiveFalse()
-                .stream()
-                .map(this::toPatientSummaryResponse)
-                .toList();
-
-        List<DoctorSummaryResponse> doctors = doctorRepository.findByActiveFalse()
+    public List<DoctorSummaryResponse> getRegisteredDoctors() {
+        return doctorRepository.findAll()
                 .stream()
                 .map(this::toDoctorSummaryResponse)
                 .toList();
+    }
 
-        return new RegisteredUsersResponse(patients, doctors);
+    public List<AdministratorSummaryResponse> getRegisteredAdministrators() {
+        return administratorRepository.findAll()
+                .stream()
+                .map(this::toAdministratorSummaryResponse)
+                .toList();
+    }
+
+    public RegisteredUsersResponse getActiveRegisteredUsers() {
+        List<PatientSummaryResponse> patients = getActiveRegisteredPatients();
+        List<DoctorSummaryResponse> doctors = getActiveRegisteredDoctors();
+        List<AdministratorSummaryResponse> administrators = getActiveRegisteredAdministrators();
+
+        return new RegisteredUsersResponse(patients, doctors, administrators);
+    }
+
+    public RegisteredUsersResponse getInactiveRegisteredUsers() {
+        List<PatientSummaryResponse> patients = getInactiveRegisteredPatients();
+        List<DoctorSummaryResponse> doctors = getInactiveRegisteredDoctors();
+        List<AdministratorSummaryResponse> administrators = getInactiveRegisteredAdministrators();
+
+        return new RegisteredUsersResponse(patients, doctors, administrators);
+    }
+
+    public List<PatientSummaryResponse> getActiveRegisteredPatients() {
+        return patientRepository.findByActiveTrue()
+                .stream()
+                .map(this::toPatientSummaryResponse)
+                .toList();
+    }
+
+    public List<DoctorSummaryResponse> getActiveRegisteredDoctors() {
+        return doctorRepository.findByActiveTrue()
+                .stream()
+                .map(this::toDoctorSummaryResponse)
+                .toList();
+    }
+
+    public List<AdministratorSummaryResponse> getActiveRegisteredAdministrators() {
+        return administratorRepository.findByActiveTrue()
+                .stream()
+                .map(this::toAdministratorSummaryResponse)
+                .toList();
+    }
+
+    public List<PatientSummaryResponse> getInactiveRegisteredPatients() {
+        return patientRepository.findByActiveFalse()
+                .stream()
+                .map(this::toPatientSummaryResponse)
+                .toList();
+    }
+
+    public List<DoctorSummaryResponse> getInactiveRegisteredDoctors() {
+        return doctorRepository.findByActiveFalse()
+                .stream()
+                .map(this::toDoctorSummaryResponse)
+                .toList();
+    }
+
+    public List<AdministratorSummaryResponse> getInactiveRegisteredAdministrators() {
+        return administratorRepository.findByActiveFalse()
+                .stream()
+                .map(this::toAdministratorSummaryResponse)
+                .toList();
     }
 
     private PatientSummaryResponse toPatientSummaryResponse(Patient patient) {
@@ -88,6 +137,19 @@ public class AdminService {
         response.setSpeciality(doctor.getSpeciality());
         response.setMedicalLicense(doctor.getMedicalLicense());
         response.setPhotoUrl(doctor.getPhotoUrl());
+        return response;
+    }
+
+    private AdministratorSummaryResponse toAdministratorSummaryResponse(Administrator administrator) {
+        AdministratorSummaryResponse response = new AdministratorSummaryResponse();
+        response.setId(administrator.getId());
+        response.setName(administrator.getName());
+        response.setLastname(administrator.getLastname());
+        response.setEmail(administrator.getEmail());
+        response.setPhone(administrator.getPhone());
+        response.setActive(administrator.getActive());
+        response.setCreatedAt(administrator.getCreatedAt());
+        response.setPosition(administrator.getPosition());
         return response;
     }
 }
