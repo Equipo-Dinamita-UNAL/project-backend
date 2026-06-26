@@ -1,112 +1,207 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.14</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>com.OdontoGate</groupId>
-	<artifactId>ArtefactoOdontoGate</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
-	<properties>
-		<java.version>21</java.version>
-	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-starter-parent</artifactId>
+       <version>3.5.14</version>
+       <relativePath/>
+    </parent>
+    <groupId>com.OdontoGate</groupId>
+    <artifactId>ArtefactoOdontoGate</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name/>
+    <description/>
+    <url/>
+    <licenses>
+       <license/>
+    </licenses>
+    <developers>
+       <developer/>
+    </developers>
+    <scm>
+       <connection/>
+       <developerConnection/>
+       <tag/>
+       <url/>
+    </scm>
+    <properties>
+       <java.version>21</java.version>
+    </properties>
 
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    <dependencies>
+       <!-- ── Dependencias originales del proyecto ── -->
+       <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-data-jpa</artifactId>
+       </dependency>
+       <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-web</artifactId>
+       </dependency>
+       <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-security</artifactId>
+       </dependency>
+       <dependency>
+          <groupId>io.jsonwebtoken</groupId>
+          <artifactId>jjwt-api</artifactId>
+          <version>0.12.6</version>
+       </dependency>
+       <dependency>
+          <groupId>io.jsonwebtoken</groupId>
+          <artifactId>jjwt-impl</artifactId>
+          <version>0.12.6</version>
+          <scope>runtime</scope>
+       </dependency>
+       <dependency>
+          <groupId>io.jsonwebtoken</groupId>
+          <artifactId>jjwt-jackson</artifactId>
+          <version>0.12.6</version>
+          <scope>runtime</scope>
+       </dependency>
+       <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <scope>runtime</scope>
+       </dependency>
+       <dependency>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok</artifactId>
+          <optional>true</optional>
+       </dependency>
+       <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-test</artifactId>
+          <scope>test</scope>
+       </dependency>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>default-compile</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-						<configuration>
-							<annotationProcessorPaths>
-								<path>
-									<groupId>org.projectlombok</groupId>
-									<artifactId>lombok</artifactId>
-								</path>
-							</annotationProcessorPaths>
-						</configuration>
-					</execution>
-					<execution>
-						<id>default-testCompile</id>
-						<phase>test-compile</phase>
-						<goals>
-							<goal>testCompile</goal>
-						</goals>
-						<configuration>
-							<annotationProcessorPaths>
-								<path>
-									<groupId>org.projectlombok</groupId>
-									<artifactId>lombok</artifactId>
-								</path>
-							</annotationProcessorPaths>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+       <!-- ── Nueva dependencia: validaciones en DTOs (MUST-8) ── -->
+       <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-validation</artifactId>
+       </dependency>
+    </dependencies>
+
+    <build>
+       <plugins>
+
+          <!-- ── Plugin original de Spring Boot ── -->
+          <plugin>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-maven-plugin</artifactId>
+             <configuration>
+                <excludes>
+                   <exclude>
+                      <groupId>org.projectlombok</groupId>
+                      <artifactId>lombok</artifactId>
+                   </exclude>
+                </excludes>
+             </configuration>
+          </plugin>
+
+          <!-- ── Plugin original del compilador con Lombok ── -->
+          <plugin>
+             <groupId>org.apache.maven.plugins</groupId>
+             <artifactId>maven-compiler-plugin</artifactId>
+             <executions>
+                <execution>
+                   <id>default-compile</id>
+                   <phase>compile</phase>
+                   <goals><goal>compile</goal></goals>
+                   <configuration>
+                      <annotationProcessorPaths>
+                         <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                         </path>
+                      </annotationProcessorPaths>
+                   </configuration>
+                </execution>
+                <execution>
+                   <id>default-testCompile</id>
+                   <phase>test-compile</phase>
+                   <goals><goal>testCompile</goal></goals>
+                   <configuration>
+                      <annotationProcessorPaths>
+                         <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                         </path>
+                      </annotationProcessorPaths>
+                   </configuration>
+                </execution>
+             </executions>
+          </plugin>
+
+          <!-- ════════════════════════════════════════════
+               SKILL BACKEND — Plugin 1: Checkstyle
+               Valida Clean Code: nombres, Javadoc,
+               imports, métodos, código comentado
+               Ejecutar: mvn checkstyle:check
+               ════════════════════════════════════════════ -->
+          <plugin>
+             <groupId>org.apache.maven.plugins</groupId>
+             <artifactId>maven-checkstyle-plugin</artifactId>
+             <version>3.3.1</version>
+             <configuration>
+                <!-- Apunta al archivo de reglas que debes poner en la raíz del proyecto -->
+                <configLocation>checkstyle.xml</configLocation>
+                <consoleOutput>true</consoleOutput>
+                <failsOnError>true</failsOnError>
+                <violationSeverity>error</violationSeverity>
+                <!-- Excluir clases generadas -->
+                <excludes>**/OdontoGateApplication.java</excludes>
+             </configuration>
+             <executions>
+                <execution>
+                   <id>skill-checkstyle</id>
+                   <phase>verify</phase>
+                   <goals><goal>check</goal></goals>
+                </execution>
+             </executions>
+          </plugin>
+
+          <!-- ════════════════════════════════════════════
+               SKILL BACKEND — Plugin 2: SpotBugs
+               Valida malas prácticas en bytecode:
+               null sin verificar, recursos sin cerrar, etc.
+               Ejecutar: mvn spotbugs:check
+               ════════════════════════════════════════════ -->
+          <plugin>
+             <groupId>com.github.spotbugs</groupId>
+             <artifactId>spotbugs-maven-plugin</artifactId>
+             <version>4.8.3.1</version>
+             <configuration>
+                <effort>Max</effort>
+                <threshold>Medium</threshold>
+                <failOnError>true</failOnError>
+             </configuration>
+             <executions>
+                <execution>
+                   <id>skill-spotbugs</id>
+                   <phase>verify</phase>
+                   <goals><goal>check</goal></goals>
+                </execution>
+             </executions>
+          </plugin>
+
+          <!-- ════════════════════════════════════════════
+               SKILL BACKEND — Plugin 3: Surefire
+               Corre todos los tests de JUnit 5 + Mockito
+               Ejecutar: mvn test
+               ════════════════════════════════════════════ -->
+          <plugin>
+             <groupId>org.apache.maven.plugins</groupId>
+             <artifactId>maven-surefire-plugin</artifactId>
+             <version>3.2.5</version>
+             <configuration>
+                <useModulePath>false</useModulePath>
+             </configuration>
+          </plugin>
+
+       </plugins>
+    </build>
 
 </project>

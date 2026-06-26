@@ -11,6 +11,6 @@ import java.util.List;
 public interface MedicalRecordRepository
         extends JpaRepository<MedicalRecord, Integer> {
 
-    List<MedicalRecord> findByPatientId(Integer patientId);
+        List<MedicalRecord> findByPatientId(Integer patientId);
 
 }

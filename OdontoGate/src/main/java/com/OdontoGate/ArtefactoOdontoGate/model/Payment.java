@@ -1,6 +1,14 @@
 package com.OdontoGate.ArtefactoOdontoGate.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -17,7 +25,7 @@ public class Payment {
     private Integer id;
 
     @OneToOne
-    @JoinColumn(name = "appointment_id")
+    @JoinColumn(name = "appointment_id", referencedColumnName = "id", nullable = false)
     private Appointment appointment;
 
     @OneToMany(mappedBy = "payment")

@@ -2,6 +2,7 @@ package com.OdontoGate.ArtefactoOdontoGate.service;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.request.ScheduleRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.response.ScheduleResponse;
+import com.OdontoGate.ArtefactoOdontoGate.exception.ScheduleExceptions;
 import com.OdontoGate.ArtefactoOdontoGate.model.Doctor;
 import com.OdontoGate.ArtefactoOdontoGate.model.Schedule;
 import com.OdontoGate.ArtefactoOdontoGate.repository.ScheduleRepository;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +19,7 @@ public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
 
-    public ScheduleResponse create(ScheduleRequest request) {
+        public ScheduleResponse create(ScheduleRequest request) {
         Schedule schedule = new Schedule();
         schedule.setWeekday(request.getWeekday());
         schedule.setStartTime(request.getStartTime());
@@ -35,32 +36,40 @@ public class ScheduleService {
         return toResponse(saved);
     }
 
-    public List<ScheduleResponse> getAll() {
+        public List<ScheduleResponse> getAll() {
         return scheduleRepository.findAll()
                 .stream()
                 .map(this::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    public List<ScheduleResponse> getByDoctor(Integer doctorId) {
+        public List<ScheduleResponse> getByDoctor(Integer doctorId) {
         return scheduleRepository.findByDoctorId(doctorId)
                 .stream()
                 .map(this::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    public void delete(Integer id) {
+        public void delete(Integer id) {
         scheduleRepository.deleteById(id);
     }
 
-    public ScheduleResponse update(Integer id, ScheduleRequest request) {
+        public ScheduleResponse update(Integer id, ScheduleRequest request) {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
 
-        if (request.getWeekday() != null) schedule.setWeekday(request.getWeekday());
-        if (request.getStartTime() != null) schedule.setStartTime(request.getStartTime());
-        if (request.getEndTime() != null) schedule.setEndTime(request.getEndTime());
-        if (request.getIsAvailable() != null) schedule.setIsAvailable(request.getIsAvailable());
+        if (request.getWeekday() != null) {
+            schedule.setWeekday(request.getWeekday());
+        }
+        if (request.getStartTime() != null) {
+            schedule.setStartTime(request.getStartTime());
+        }
+        if (request.getEndTime() != null) {
+            schedule.setEndTime(request.getEndTime());
+        }
+        if (request.getIsAvailable() != null) {
+            schedule.setIsAvailable(request.getIsAvailable());
+        }
 
         LocalTime startFinal = request.getStartTime() != null ? request.getStartTime() : schedule.getStartTime();
         LocalTime endFinal = request.getEndTime() != null ? request.getEndTime() : schedule.getEndTime();
@@ -71,7 +80,7 @@ public class ScheduleService {
         return toResponse(saved);
     }
 
-    public ScheduleResponse setAvailable(Integer id, Boolean available) {
+        public ScheduleResponse setAvailable(Integer id, Boolean available) {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
 
@@ -83,7 +92,7 @@ public class ScheduleService {
 
     private void validarHorario(LocalTime startTime, LocalTime endTime) {
         if (!startTime.isBefore(endTime)) {
-            throw new RuntimeException("La hora de inicio debe ser anterior a la hora de fin");
+            throw new ScheduleExceptions.InvalidScheduleTimeException();
         }
     }
 

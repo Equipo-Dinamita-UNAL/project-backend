@@ -11,8 +11,8 @@ import java.util.Optional;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Integer>{
 
-    Optional<Payment> findByAppointmentId(Integer appointmentId);
-    List<Payment> findByAppointmentPatientId(Integer patientId);
-    List<Payment> findByStatus(String status);
-    List<Payment> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+        Optional<Payment> findByAppointmentId(Integer appointmentId);
+        List<Payment> findByAppointmentPatientId(Integer patientId);
+        List<Payment> findByStatus(String status);
+        List<Payment> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }
