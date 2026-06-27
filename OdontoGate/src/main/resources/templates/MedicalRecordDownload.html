@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Historia Clínica</title>
+    <style>
+        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #333; margin: 40px; }
+        .header { text-align: center; border-bottom: 2px solid #2c3e50; padding-bottom: 15px; margin-bottom: 30px; }
+        .header h1 { color: #2c3e50; margin: 0; font-size: 24px; }
+        .header p { color: #7f8c8d; margin: 5px 0 0 0; }
+        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .info-table th, .info-table td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+        .info-table th { background-color: #f8f9fa; color: #2c3e50; width: 40%; font-weight: bold; }
+        .observations-row td { background-color: #fefefe; font-style: italic; }
+        .footer { text-align: center; font-size: 12px; color: #95a5a6; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Historia Clínica</h1>
+    <p>ID: <span th:text="${record.id}">0</span></p>
+    <p>Fecha: <span th:text="${#temporals.format(record.date, 'dd/MM/yyyy HH:mm')}">01/01/2026 12:00</span></p>
+</div>
+
+<table class="info-table">
+    <tr>
+        <th>ID Paciente:</th>
+        <td th:text="${record.patientId}">0</td>
+    </tr>
+    <tr>
+        <th>Diagnóstico:</th>
+        <td th:text="${record.diagnosis}">-</td>
+    </tr>
+    <tr>
+        <th>Tratamiento:</th>
+        <td th:text="${record.treatment}">-</td>
+    </tr>
+    <tr class="observations-row">
+        <th>Observaciones:</th>
+        <td th:text="${record.observations}">-</td>
+    </tr>
+    <tr>
+        <th>Fecha de creación:</th>
+        <td th:text="${#temporals.format(record.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2026</td>
+    </tr>
+</table>
+
+<div class="footer">
+    <p>Este documento es una historia clínica oficial.</p>
+    <p>Gracias por confiar en nuestros servicios de salud dental.</p>
+</div>
+
+</body>
+</html>

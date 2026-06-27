@@ -147,7 +147,7 @@ public class GlobalExceptionHandler {
         error.put(ERROR_KEY, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
-<<<<<<< HEAD
+
     @ExceptionHandler(MaxUploadSizeExceededException.class)
 public ResponseEntity<Map<String, String>> handleMaxUploadSize(
         MaxUploadSizeExceededException ex) {
@@ -196,7 +196,6 @@ public ResponseEntity<Map<String, String>> handleDocumentNotOwner(
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
 }
     
-=======
 
     @ExceptionHandler(MercadoPagoIntegrationException.class)
     public ResponseEntity<Map<String, String>> handleMercadoPagoException(MercadoPagoIntegrationException ex) {
@@ -208,5 +207,5 @@ public ResponseEntity<Map<String, String>> handleDocumentNotOwner(
         // Retorna un HTTP 503 (Service Unavailable)
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
     }
->>>>>>> 035b10f29ab68d8085dca60acb95ec26e1643a45
+
 }

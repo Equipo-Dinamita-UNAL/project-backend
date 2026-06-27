@@ -1,6 +1,8 @@
 package com.OdontoGate.ArtefactoOdontoGate.controller;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses.MedicalDocumentResponse;
+import com.OdontoGate.ArtefactoOdontoGate.model.User;
+import com.OdontoGate.ArtefactoOdontoGate.repository.UserRepository;
 import com.OdontoGate.ArtefactoOdontoGate.service.MedicalDocumentService;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -32,20 +34,14 @@ import java.util.List;
 public class MedicalDocumentController {
 
     private final MedicalDocumentService service;
+    private final UserRepository userRepository;
 
-    public MedicalDocumentController(MedicalDocumentService service) {
+    public MedicalDocumentController(MedicalDocumentService service,
+                                     UserRepository userRepository) {
         this.service = service;
+        this.userRepository = userRepository;
     }
 
-    /**
-     * POST /api/medical-documents
-     * Sube un archivo médico. Solo DOCTOR o ADMINISTRATOR.
-     * Parámetros multipart:
-     *   - file        : archivo a subir (obligatorio)
-     *   - patientId   : ID del paciente (obligatorio)
-     *   - medicalRecordId : ID de la historia clínica (opcional)
-     *   - description : descripción del documento (opcional)
-     */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('DOCTOR_CREAR_HISTORIA_CLINICA')")
@@ -59,12 +55,6 @@ public class MedicalDocumentController {
         return service.upload(file, patientId, medicalRecordId, description, uploadedBy);
     }
 
-    /**
-     * GET /api/medical-documents/patient/{patientId}
-     * Consulta todos los documentos de un paciente.
-     * - PATIENT: solo puede ver los suyos propios.
-     * - DOCTOR / ADMINISTRATOR: puede ver los de cualquier paciente.
-     */
     @GetMapping("/patient/{patientId}")
     @PreAuthorize("hasRole('ADMINISTRATOR') "
             + "or hasAuthority('DOCTOR_LEER_HISTORIA_CLINICA') "
@@ -75,11 +65,6 @@ public class MedicalDocumentController {
         return service.findByPatient(patientId, requestingUserId, requestingUserRole);
     }
 
-    /**
-     * GET /api/medical-documents/medical-record/{medicalRecordId}
-     * Retorna todos los documentos asociados a una historia clínica.
-     * Solo DOCTOR o ADMINISTRATOR.
-     */
     @GetMapping("/medical-record/{medicalRecordId}")
     @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('DOCTOR_LEER_HISTORIA_CLINICA')")
     public List<MedicalDocumentResponse> findByMedicalRecord(
@@ -87,11 +72,6 @@ public class MedicalDocumentController {
         return service.findByMedicalRecord(medicalRecordId);
     }
 
-    /**
-     * GET /api/medical-documents/{id}
-     * Retorna los metadatos de un documento.
-     * El paciente solo puede ver documentos que le pertenecen.
-     */
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRATOR') "
             + "or hasAuthority('DOCTOR_LEER_HISTORIA_CLINICA') "
@@ -102,11 +82,6 @@ public class MedicalDocumentController {
         return service.findById(id, requestingUserId, requestingUserRole);
     }
 
-    /**
-     * GET /api/medical-documents/{id}/download
-     * Descarga el archivo físico.
-     * El paciente solo puede descargar documentos que le pertenecen.
-     */
     @GetMapping("/{id}/download")
     @PreAuthorize("hasRole('ADMINISTRATOR') "
             + "or hasAuthority('DOCTOR_LEER_HISTORIA_CLINICA') "
@@ -137,10 +112,6 @@ public class MedicalDocumentController {
         }
     }
 
-    /**
-     * DELETE /api/medical-documents/{id}
-     * Elimina un documento. Solo ADMINISTRATOR o DOCTOR.
-     */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('DOCTOR_MODIFICAR_HISTORIA_CLINICA')")
@@ -148,20 +119,14 @@ public class MedicalDocumentController {
         service.delete(id);
     }
 
-    // ── helpers de seguridad ─────────────────────────────────────────────────
-
-    /**
-     * Extrae el userId que está en los claims del JWT.
-     * El JwtAuthenticationFilter guarda el userId como detalle de la autenticación.
-     */
     private Integer getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Object details = auth.getDetails();
-        if (details instanceof Integer) {
-            return (Integer) details;
+        String email = auth.getName();
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new IllegalStateException("Usuario no encontrado");
         }
-        // Fallback: intentar castear desde el principal (nombre = email → no sirve para ID)
-        throw new IllegalStateException("No se pudo obtener el userId del token JWT");
+        return user.getId();
     }
 
     private String getCurrentUserRole() {
