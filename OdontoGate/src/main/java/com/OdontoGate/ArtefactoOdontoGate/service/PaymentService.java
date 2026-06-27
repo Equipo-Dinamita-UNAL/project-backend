@@ -17,6 +17,7 @@ import jakarta.transaction.Transactional;
 import com.OdontoGate.ArtefactoOdontoGate.repository.TreatmentRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -25,21 +26,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
 
+    private static final String STATUS_PAGADO = "PAGADO";
+    private static final String STATUS_PENDIENTE = "PENDIENTE";
+
     private final PaymentRepository paymentRepository;
     private final AppointmentRepository appointmentRepository;
     private final ApplicationEventPublisher eventPublisher;
-
-    // 👈 2. Inyectamos el TreatmentRepository para verificar precios reales en DB
     private final TreatmentRepository treatmentRepository;
-
     private final PaymentGateway paymentGateway;
 
-    // Crear pago
-    // ===== FLUJO VIRTUAL (el paciente paga con MercadoPago) =====
     @Transactional
     public PaymentResponse createVirtualPayment(PaymentRequest request) {
 
@@ -47,7 +47,7 @@ public class PaymentService {
         validateNoExistingPayment(request.getAppointmentId());
         BigDecimal amount = calculateCorrectAmount(appointment, request.getAmount());
 
-        Payment payment = buildPayment(appointment, amount, "MERCADO_PAGO", "PENDIENTE");
+        Payment payment = buildPayment(appointment, amount, "MERCADO_PAGO", STATUS_PENDIENTE);
         Payment savedPayment = paymentRepository.save(payment);
 
         String checkoutUrl = paymentGateway.generateCheckoutUrl(
@@ -61,7 +61,7 @@ public class PaymentService {
         return response;
     }
 
-    // ===== FLUJO PRESENCIAL (el admin registra un pago ya recibido) =====
+
     @Transactional
     public PaymentResponse createPresentialPayment(PaymentRequest request) {
 
@@ -69,18 +69,16 @@ public class PaymentService {
         validateNoExistingPayment(request.getAppointmentId());
         BigDecimal amount = calculateCorrectAmount(appointment, request.getAmount());
 
-        Payment payment = buildPayment(appointment, amount, request.getMethod(), "PAGADO");
+        Payment payment = buildPayment(appointment, amount, request.getMethod(), STATUS_PAGADO);
         Payment savedPayment = paymentRepository.save(payment);
 
-        appointment.setStatus("pagada");
-        appointmentRepository.save(appointment);
+        markAppointmentAsPaid(savedPayment);
 
-        eventPublisher.publishEvent(new PaymentApprovedEvent(savedPayment.getId()));
+        log.info("💰 Pago presencial #{} registrado y cita #{} marcada como pagada",
+                savedPayment.getId(), appointment.getId());
 
         return mapToResponse(savedPayment);
     }
-
-    // ===== MÉTODOS PRIVADOS COMPARTIDOS =====
 
     private Appointment findAppointmentOrThrow(Integer appointmentId) {
         return appointmentRepository.findById(appointmentId)
@@ -116,62 +114,89 @@ public class PaymentService {
     }
 
     @Transactional
-    @SuppressWarnings("unchecked")
     public void processWebhook(Map<String, Object> body) {
+        // Responsabilidad 1: Delegamos la extracción del ID
+        String mpPaymentId = extractPaymentId(body);
+
+        if (mpPaymentId == null) {
+            return;
+        }
+
+        log.info("✅ Procesando pago de MercadoPago con id: {}", mpPaymentId);
+
+        // Coordinación externa
+        PaymentInfo info = paymentGateway.getPaymentInfo(mpPaymentId);
+        Integer localPaymentId = Integer.parseInt(info.externalReference());
+
+        // Responsabilidad 3: Delegamos la actualización del negocio si el pago fue aprobado
+        if ("approved".equals(info.status())) {
+            updateStatus(localPaymentId, STATUS_PAGADO, mpPaymentId);
+        }
+    }
+    @SuppressWarnings("unchecked")
+    private String extractPaymentId(Map<String, Object> body) {
         String topic = (String) body.get("topic");
         String type = (String) body.get("type");
 
-        String mpPaymentId = null;
-
-        //REVISAR IFS Y SEPARAR EN METODOS PEQUEÑOS
-
         if ("merchant_order".equals(topic)) {
-            // Ignoramos este topic, solo nos interesa "payment"
-            System.out.println("⚠️ Notificación de merchant_order ignorada, esperando topic=payment");
-            return;
+            log.info("⚠️ Notificación de merchant_order ignorada, esperando topic=payment");
+            return null;
         }
 
         // Formato 1: {"resource": "164578842435", "topic": "payment"}
         if ("payment".equals(topic) && body.get("resource") != null) {
-            mpPaymentId = String.valueOf(body.get("resource"));
+            return String.valueOf(body.get("resource"));
         }
 
         // Formato 2: {"data": {"id": 164578842435}, "type": "payment"}
-        if (mpPaymentId == null && "payment".equals(type)) {
+        if ("payment".equals(type)) {
             Map<String, Object> data = (Map<String, Object>) body.get("data");
             if (data != null && data.get("id") != null) {
-                mpPaymentId = String.valueOf(data.get("id"));
+                return String.valueOf(data.get("id"));
             }
         }
 
-        if (mpPaymentId == null) {
-            System.out.println("⚠️ No se pudo extraer el paymentId, saliendo");
-            return;
-        }
-
-        System.out.println("✅ Procesando pago de MercadoPago con id: " + mpPaymentId);
-
-        PaymentInfo info = paymentGateway.getPaymentInfo(mpPaymentId);
-
-        Integer localPaymentId = Integer.parseInt(info.externalReference());
-
-        Payment payment = paymentRepository.findById(localPaymentId)
-                .orElseThrow(() -> new PaymentExceptions.PaymentNotFoundException(localPaymentId));
-
-        if ("approved".equals(info.status())) {
-            payment.setStatus("PAGADO");
-            payment.setGatewayReference(mpPaymentId);
-            paymentRepository.save(payment);
-
-            Appointment appointment = payment.getAppointment();
-            appointment.setStatus("pagada");
-            appointmentRepository.save(appointment);
-
-            eventPublisher.publishEvent(new PaymentApprovedEvent(payment.getId()));
-        }
+        log.warn("⚠️ No se pudo extraer el paymentId del webhook recibido");
+        return null;
     }
 
-    // Ver pagos por paciente
+    @Transactional
+    public PaymentResponse updateStatus(Integer id, String status, String gatewayReference) {
+        Payment payment = paymentRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
+
+        if (status.equals(payment.getStatus())) {
+            log.info("⚠️ Pago #{} ya estaba en estado {}, ignorando actualización duplicada", id, status);
+            return mapToResponse(payment);
+        }
+
+        payment.setStatus(status);
+
+        if (gatewayReference != null) {
+            payment.setGatewayReference(gatewayReference);
+        }
+
+        paymentRepository.save(payment);
+
+        log.info("🔄 Pago #{} actualizado a estado: {}", id, status);
+
+        if (STATUS_PAGADO.equals(status)) {
+            markAppointmentAsPaid(payment);
+        }
+
+        return mapToResponse(payment);
+    }
+
+    private void markAppointmentAsPaid(Payment payment) {
+        Appointment appointment = payment.getAppointment();
+        appointment.setStatus(STATUS_PAGADO);
+        appointmentRepository.save(appointment);
+
+        eventPublisher.publishEvent(new PaymentApprovedEvent(payment.getId()));
+
+        log.info("📋 Cita #{} marcada como pagada, evento PaymentApprovedEvent publicado", appointment.getId());
+    }
+
     public List<PaymentResponse> getPaymentPatient(Integer patientId) {
         return paymentRepository.findByAppointmentPatientId(patientId)
                 .stream()
@@ -179,14 +204,12 @@ public class PaymentService {
                 .toList();
     }
 
-    // Ver pagos por cita
     public PaymentResponse getPaymentByAppointment(Integer appointmentId) {
         Payment payment = paymentRepository.findByAppointmentId(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Pago no encontrado para esta cita"));
         return mapToResponse(payment);
     }
 
-    // Ver todos los pagos
     public List<PaymentResponse> getAllPayments() {
         return paymentRepository.findAll()
                 .stream()
@@ -194,31 +217,12 @@ public class PaymentService {
                 .toList();
     }
 
-    // Ver pago por id
     public PaymentResponse getPaymentById(Integer id) {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
         return mapToResponse(payment);
     }
 
-    // Actualizar estado
-        @Transactional
-        public PaymentResponse updateStatus(Integer id, String status) {
-            Payment payment = paymentRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
-            payment.setStatus(status);
-
-            if ("PAGADO".equals(status)) {
-                Appointment app = payment.getAppointment();
-                app.setStatus("pagada");
-                // ¡Gritas al aire que el pago se aprobó! No llamas a ReceiptService.
-                eventPublisher.publishEvent(new PaymentApprovedEvent(payment.getId()));
-            }
-
-        return mapToResponse(paymentRepository.save(payment));
-    }
-
-    // Consultar cartera por rango de fechas (Para el Administrador)
     public List<PaymentResponse> getPaymentsByDateRange(LocalDateTime start, LocalDateTime end) {
         return paymentRepository.findByCreatedAtBetween(start, end)
                 .stream()
@@ -226,7 +230,6 @@ public class PaymentService {
                 .toList();
     }
 
-    // Mapeo
     private PaymentResponse mapToResponse(Payment payment) {
         PaymentResponse response = new PaymentResponse();
         response.setId(payment.getId());

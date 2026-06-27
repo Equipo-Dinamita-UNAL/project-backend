@@ -10,15 +10,25 @@ import com.mercadopago.client.preference.PreferenceItemRequest;
 import com.mercadopago.client.preference.PreferenceRequest;
 import com.mercadopago.core.MPRequestOptions;
 import com.mercadopago.resources.preference.Preference;
-
-
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 
+
 @Service
+@RequiredArgsConstructor
 public class MercadoPagoService implements PaymentGateway {
+
+    private final PreferenceClient preferenceClient;
+
+    @Value("${mercadopago.currency}")
+    private String currencyId;
+
+    @Value("${mercadopago.webhook.url}")
+    private String notificationUrl;
 
     @Override
     public String generateCheckoutUrl(String referenceId, BigDecimal amount, String title) {
@@ -27,35 +37,33 @@ public class MercadoPagoService implements PaymentGateway {
                     .accessToken(MercadoPagoConfig.getAccessToken())
                     .build();
 
-            PreferenceClient client = new PreferenceClient();
-
-            // 1. Creamos el item a cobrar (La cita odontológica)
             PreferenceItemRequest item = PreferenceItemRequest.builder()
                     .title(title)
                     .quantity(1)
                     .unitPrice(amount)
-                    .currencyId("COP") // Cambia a MXN, ARS, CLP según tu país
+                    .currencyId(currencyId)
                     .build();
 
-            // 2. Creamos la preferencia
             PreferenceRequest request = PreferenceRequest.builder()
                     .items(Collections.singletonList(item))
-                    .externalReference(referenceId) // ¡CLAVE! MP nos devolverá este ID en el Webhook
-                    .notificationUrl("https://cloak-unblended-reverence.ngrok-free.dev/api/payment/webhook")
+                    .externalReference(referenceId)
+                    .notificationUrl(notificationUrl)
                     .build();
 
-            // 3. Enviamos la petición a Mercado Pago
-            Preference preference = client.create(request, requestOptions);
+            Preference preference = preferenceClient.create(request, requestOptions);
 
-            // 5. CRÍTICO: Usamos Sandbox (entorno de pruebas) para evitar bloqueos
             return preference.getInitPoint();
 
         } catch (com.mercadopago.exceptions.MPApiException apiException) {
-            System.err.println("❌ Detalle exacto: " + apiException.getApiResponse().getContent());
-            throw new MercadoPagoIntegrationException("Rechazado por Mercado Pago", apiException);
+            String reason = "Sin detalles";
+
+            if (apiException.getApiResponse() != null) {
+                reason = apiException.getApiResponse().getContent();
+            }
+
+            throw new MercadoPagoIntegrationException("Rechazado por Mercado Pago. Motivo: " + reason, apiException);
 
         } catch (Exception e) {
-            e.printStackTrace();
             throw new MercadoPagoIntegrationException("Error al comunicarse con la API de Mercado Pago al crear la preferencia", e);
         }
     }
