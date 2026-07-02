@@ -8,6 +8,7 @@ public class MedicalRecordResponse {
 
     private Integer id;
     private Integer patientId;
+    private String patientName;
     private String diagnosis;
     private String treatment;
     private String observations;

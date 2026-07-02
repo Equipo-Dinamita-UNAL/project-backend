@@ -51,8 +51,12 @@ public class MedicalRecordController {
         return service.findById(id);
     }
 
-        @GetMapping("/patient/{patientId}")
-    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('DOCTOR_LEER_HISTORIA_CLINICA')")
+    @GetMapping("/patient/{patientId}")
+    @PreAuthorize(
+            "hasRole('ADMINISTRATOR') " +
+                    "or hasAuthority('DOCTOR_LEER_HISTORIA_CLINICA') " +
+                    "or (hasRole('PATIENT') and #patientId == authentication.principal.id)"
+    )
     public List<MedicalRecordResponse> findByPatient(
             @PathVariable Integer patientId) {
         return service.findByPatient(patientId);

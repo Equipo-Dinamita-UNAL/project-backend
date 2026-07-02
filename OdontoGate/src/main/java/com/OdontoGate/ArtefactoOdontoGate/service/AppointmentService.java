@@ -17,6 +17,7 @@ import com.OdontoGate.ArtefactoOdontoGate.repository.ScheduleRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.TreatmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import java.time.DayOfWeek;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -29,50 +30,46 @@ public class AppointmentService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
     private final ScheduleRepository scheduleRepository;
-
-    // 1. REPOSITORIO DE TRATAMIENTOS INYECTADO AUTOMÁTICAMENTE POR LOMBOK 🚀
     private final TreatmentRepository treatmentRepository;
 
-    // Crear cita
     public AppointmentResponse create(AppointmentRequest request) {
-        Appointment appointment = new Appointment();
-        appointment.setDate(request.getDate());
-        appointment.setTime(request.getTime());
-        appointment.setStatus(request.getStatus());
-        appointment.setReason(request.getReason());
-
         Patient patient = patientRepository.findById(request.getPatientId())
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
 
         Doctor doctor = doctorRepository.findById(request.getDoctorId())
                 .orElseThrow(() -> new RuntimeException("Doctor no encontrado"));
 
-        appointment.setPatient(patient);
-        appointment.setDoctor(doctor);
-
-        Schedule schedule = new Schedule();
-        schedule.setId(request.getDoctorScheduleId());
-        appointment.setDoctorSchedule(schedule);
+        Schedule schedule = scheduleRepository.findById(request.getDoctorScheduleId())
+                .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
 
         User modifiedBy = new User();
         modifiedBy.setId(request.getModifiedBy());
-        appointment.setModifiedBy(modifiedBy);
 
         validarCita(
                 request.getDate(),
                 request.getTime(),
                 request.getDoctorId(),
-                request.getDoctorScheduleId(),
+                schedule,
                 null
         );
 
+        Appointment appointment = new Appointment();
+        appointment.setDate(request.getDate());
+        appointment.setTime(request.getTime());
+        appointment.setStatus(request.getStatus());
+        appointment.setReason(request.getReason());
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setDoctorSchedule(schedule);
+        appointment.setModifiedBy(modifiedBy);
+
         appointmentRepository.save(appointment);
+
         Appointment saved = appointmentRepository.findById(appointment.getId())
                 .orElseThrow(() -> new RuntimeException("Error al guardar la cita"));
         return toResponse(saved);
     }
 
-    // Obtener todas las citas
     public List<AppointmentResponse> getAll() {
         return appointmentRepository.findAll()
                 .stream()
@@ -80,7 +77,6 @@ public class AppointmentService {
                 .toList();
     }
 
-    // Obtener citas de un paciente
     public List<AppointmentResponse> getByPatient(Integer patientId) {
         return appointmentRepository.findByPatientId(patientId)
                 .stream()
@@ -88,7 +84,6 @@ public class AppointmentService {
                 .toList();
     }
 
-    // Obtener citas de un doctor
     public List<AppointmentResponse> getByDoctor(Integer doctorId) {
         return appointmentRepository.findByDoctorId(doctorId)
                 .stream()
@@ -96,24 +91,22 @@ public class AppointmentService {
                 .toList();
     }
 
-    // Eliminar cita
     public void delete(Integer id) {
         appointmentRepository.deleteById(id);
     }
 
-    // Modificar cita
     public AppointmentResponse update(Integer id, AppointmentUpdateRequest request) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
-        if (request.getDate() != null) { appointment.setDate(request.getDate()); }
-        if (request.getTime() != null) { appointment.setTime(request.getTime()); }
-        if (request.getReason() != null) { appointment.setReason(request.getReason()); }
+        if (request.getDate() != null) appointment.setDate(request.getDate());
+        if (request.getTime() != null) appointment.setTime(request.getTime());
+        if (request.getReason() != null) appointment.setReason(request.getReason());
 
         if (request.getDoctorScheduleId() != null) {
-            Schedule schedule = new Schedule();
-            schedule.setId(request.getDoctorScheduleId());
-            appointment.setDoctorSchedule(schedule);
+            Schedule newSchedule = scheduleRepository.findById(request.getDoctorScheduleId())
+                    .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
+            appointment.setDoctorSchedule(newSchedule);
         }
 
         if (request.getModifiedBy() != null) {
@@ -124,11 +117,9 @@ public class AppointmentService {
 
         LocalDate fechaFinal = request.getDate() != null ? request.getDate() : appointment.getDate();
         LocalTime horaFinal = request.getTime() != null ? request.getTime() : appointment.getTime();
-        Integer scheduleId = request.getDoctorScheduleId() != null
-                ? request.getDoctorScheduleId()
-                : appointment.getDoctorSchedule().getId();
+        Schedule scheduleFinal = appointment.getDoctorSchedule();
 
-        validarCita(fechaFinal, horaFinal, appointment.getDoctor().getId(), scheduleId, id);
+        validarCita(fechaFinal, horaFinal, appointment.getDoctor().getId(), scheduleFinal, id);
 
         appointmentRepository.save(appointment);
         Appointment saved = appointmentRepository.findById(appointment.getId())
@@ -136,40 +127,54 @@ public class AppointmentService {
         return toResponse(saved);
     }
 
-    // Cancelar cita
     public AppointmentResponse cancel(Integer id) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
+        // ✅ Ya no necesitamos liberar el schedule
         appointment.setStatus("cancelada");
-
         appointmentRepository.save(appointment);
+
         Appointment saved = appointmentRepository.findById(appointment.getId())
                 .orElseThrow(() -> new RuntimeException("Error al cancelar la cita"));
         return toResponse(saved);
     }
 
     private void validarCita(LocalDate date, LocalTime time, Integer doctorId,
-                             Integer scheduleId, Integer excludeId) {
+                             Schedule schedule, Integer excludeId) {
 
         // 1. Fecha futura
         if (!date.isAfter(LocalDate.now())) {
             throw new AppointmentExceptions.InvalidDateException();
         }
 
-        // 2. Horario disponible
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new AppointmentExceptions.ScheduleNotFoundException(scheduleId));
-
+        // 2. El schedule no debe estar bloqueado manualmente
         if (Boolean.FALSE.equals(schedule.getIsAvailable())) {
             throw new AppointmentExceptions.ScheduleNotAvailableException();
         }
 
-        // 3. Sin conflicto de horario con el doctor
+        // 3. El día de la semana de la fecha debe coincidir con el weekday del schedule
+        String diaSemana = date.getDayOfWeek().name(); // "MONDAY", "TUESDAY", etc.
+        if (!diaSemana.equals(schedule.getWeekday())) {
+            throw new RuntimeException(
+                    "La fecha seleccionada (" + diaSemana + ") no corresponde al dia del horario (" + schedule.getWeekday() + ")"
+            );
+        }
+
+        // 4. La hora debe estar dentro del rango del schedule
+        if (time.isBefore(schedule.getStartTime()) || !time.isBefore(schedule.getEndTime())) {
+            throw new RuntimeException(
+                    "La hora " + time + " esta fuera del rango del horario (" +
+                            schedule.getStartTime() + " - " + schedule.getEndTime() + ")"
+            );
+        }
+
+        // 5. Sin conflicto: no puede haber otra cita activa para ese doctor en esa fecha y hora
         List<Appointment> conflictos = appointmentRepository
                 .findByDoctorIdAndDateAndTime(doctorId, date, time);
 
         boolean hayConflicto = conflictos.stream()
+                .filter(a -> !"cancelada".equalsIgnoreCase(a.getStatus()))
                 .anyMatch(a -> !a.getId().equals(excludeId));
 
         if (hayConflicto) {
@@ -177,19 +182,13 @@ public class AppointmentService {
         }
     }
 
-    // 2. CÁLCULO DINÁMICO DESDE LA BASE DE DATOS (MÉTODO MEJORADO) 🚀
     private Double calculatePriceByReason(String reason) {
-        if (reason == null) {
-            return 70000.00; // Tarifa básica por defecto si la cita no tiene motivo
-        }
-
-        // Busca el nombre en la tabla 'treatment'. Si existe extrae su precio, si no, usa la tarifa base.
+        if (reason == null) return 70000.00;
         return treatmentRepository.findByName(reason.trim())
                 .map(Treatment::getPrice)
                 .orElse(70000.00);
     }
 
-    // Convertir entidad a Response
     private AppointmentResponse toResponse(Appointment appointment) {
         AppointmentResponse response = new AppointmentResponse();
         response.setId(appointment.getId());
@@ -205,10 +204,7 @@ public class AppointmentService {
                 appointment.getDoctor().getName() + " " +
                         appointment.getDoctor().getLastname()
         );
-
-        // ASIGNACIÓN DE PRECIO AUTOMÁTICO DINÁMICO ✅
         response.setPrice(calculatePriceByReason(appointment.getReason()));
-
         return response;
     }
 }

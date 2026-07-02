@@ -143,7 +143,7 @@ public class UserService {
         return response;
     }
 
-        public DeleteUserResponse deleteUser(DeleteUserRequest request){
+    public DeleteUserResponse deleteUser(DeleteUserRequest request){
         DeleteUserResponse response = new DeleteUserResponse();
 
         User user = userRepository.findByEmail(request.getEmail());
@@ -155,30 +155,14 @@ public class UserService {
             );
         }
 
-        Integer userId = user.getId();
+        // Soft delete: en vez de borrar físicamente (lo cual falla si el usuario
+        // tiene registros relacionados, como citas o historial clínico), se
+        // desactiva la cuenta. Esto preserva la integridad referencial y el
+        // historial clínico/de citas para auditoría y trazabilidad.
+        user.setActive(false);
+        userRepository.save(user);
 
-        boolean administrator = administratorRepository.existsById(userId);
-
-        if(administrator){
-            administratorRepository.deleteById(userId);
-        }
-
-        boolean patient = patientRepository.existsById(userId);
-
-        if(patient){
-            patientRepository.deleteById(userId);
-        }
-
-        boolean doctor = doctorRepository.existsById(userId);
-
-        if(doctor){
-            doctorRepository.deleteById(userId);
-        }
-
-        userRepository.deleteById(userId);
-
-
-        response.setMensaje("Usuario eliminado correctamente.");
+        response.setMensaje("Usuario desactivado correctamente.");
         response.setEmail(request.getEmail());
 
         return response;

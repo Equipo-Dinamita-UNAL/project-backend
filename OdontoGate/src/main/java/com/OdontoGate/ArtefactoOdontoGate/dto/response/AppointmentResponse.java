@@ -15,4 +15,5 @@ public class AppointmentResponse {
     private String status;
     private String reason;
     private Double price;
+    private Boolean patientActive;
 }

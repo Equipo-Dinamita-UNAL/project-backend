@@ -22,91 +22,63 @@ public class AdminService {
     private final DoctorRepository doctorRepository;
     private final AdministratorRepository administratorRepository;
 
-    public RegisteredUsersResponse getRegisteredUsers() {
-        List<PatientSummaryResponse> patients = getRegisteredPatients();
-        List<DoctorSummaryResponse> doctors = getRegisteredDoctors();
-        List<AdministratorSummaryResponse> administrators = getRegisteredAdministrators();
+    public RegisteredUsersResponse getRegisteredPatientsAndDoctors() {
+        List<PatientSummaryResponse> patients = patientRepository.findAll()
+                .stream()
+                .map(this::toPatientSummaryResponse)
+                .toList();
+
+        List<DoctorSummaryResponse> doctors = doctorRepository.findAll()
+                .stream()
+                .map(this::toDoctorSummaryResponse)
+                .toList();
+
+        List<AdministratorSummaryResponse> administrators = administratorRepository.findAll()
+                .stream()
+                .map(this::toAdministratorSummaryResponse)
+                .toList();
 
         return new RegisteredUsersResponse(patients, doctors, administrators);
     }
 
-    public List<PatientSummaryResponse> getRegisteredPatients() {
-        return patientRepository.findAll()
+    public RegisteredUsersResponse getActiveRegisteredPatientsAndDoctors() {
+        List<PatientSummaryResponse> patients = patientRepository.findByActiveTrue()
                 .stream()
                 .map(this::toPatientSummaryResponse)
                 .toList();
-    }
 
-    public List<DoctorSummaryResponse> getRegisteredDoctors() {
-        return doctorRepository.findAll()
+        List<DoctorSummaryResponse> doctors = doctorRepository.findByActiveTrue()
                 .stream()
                 .map(this::toDoctorSummaryResponse)
                 .toList();
-    }
 
-    public List<AdministratorSummaryResponse> getRegisteredAdministrators() {
-        return administratorRepository.findAll()
+        List<AdministratorSummaryResponse> administrators = administratorRepository.findAll()
                 .stream()
+                .filter(a -> Boolean.TRUE.equals(a.getActive()))
                 .map(this::toAdministratorSummaryResponse)
                 .toList();
-    }
-
-    public RegisteredUsersResponse getActiveRegisteredUsers() {
-        List<PatientSummaryResponse> patients = getActiveRegisteredPatients();
-        List<DoctorSummaryResponse> doctors = getActiveRegisteredDoctors();
-        List<AdministratorSummaryResponse> administrators = getActiveRegisteredAdministrators();
 
         return new RegisteredUsersResponse(patients, doctors, administrators);
     }
 
-    public RegisteredUsersResponse getInactiveRegisteredUsers() {
-        List<PatientSummaryResponse> patients = getInactiveRegisteredPatients();
-        List<DoctorSummaryResponse> doctors = getInactiveRegisteredDoctors();
-        List<AdministratorSummaryResponse> administrators = getInactiveRegisteredAdministrators();
+    public RegisteredUsersResponse getInactiveRegisteredPatientsAndDoctors() {
+        List<PatientSummaryResponse> patients = patientRepository.findByActiveFalse()
+                .stream()
+                .map(this::toPatientSummaryResponse)
+                .toList();
+
+        List<DoctorSummaryResponse> doctors = doctorRepository.findByActiveFalse()
+                .stream()
+                .map(this::toDoctorSummaryResponse)
+                .toList();
+
+        List<AdministratorSummaryResponse> administrators = administratorRepository.findAll()
+                .stream()
+                .filter(a -> Boolean.FALSE.equals(a.getActive()))
+                .map(this::toAdministratorSummaryResponse)
+                .toList();
 
         return new RegisteredUsersResponse(patients, doctors, administrators);
-    }
-
-    public List<PatientSummaryResponse> getActiveRegisteredPatients() {
-        return patientRepository.findByActiveTrue()
-                .stream()
-                .map(this::toPatientSummaryResponse)
-                .toList();
-    }
-
-    public List<DoctorSummaryResponse> getActiveRegisteredDoctors() {
-        return doctorRepository.findByActiveTrue()
-                .stream()
-                .map(this::toDoctorSummaryResponse)
-                .toList();
-    }
-
-    public List<AdministratorSummaryResponse> getActiveRegisteredAdministrators() {
-        return administratorRepository.findByActiveTrue()
-                .stream()
-                .map(this::toAdministratorSummaryResponse)
-                .toList();
-    }
-
-    public List<PatientSummaryResponse> getInactiveRegisteredPatients() {
-        return patientRepository.findByActiveFalse()
-                .stream()
-                .map(this::toPatientSummaryResponse)
-                .toList();
-    }
-
-    public List<DoctorSummaryResponse> getInactiveRegisteredDoctors() {
-        return doctorRepository.findByActiveFalse()
-                .stream()
-                .map(this::toDoctorSummaryResponse)
-                .toList();
-    }
-
-    public List<AdministratorSummaryResponse> getInactiveRegisteredAdministrators() {
-        return administratorRepository.findByActiveFalse()
-                .stream()
-                .map(this::toAdministratorSummaryResponse)
-                .toList();
     }
 
     private PatientSummaryResponse toPatientSummaryResponse(Patient patient) {

@@ -32,12 +32,13 @@ public class ApplicationUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Usuario no encontrado: " + email);
         }
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail())
-                .password(user.getPassword())
-                .disabled(Boolean.FALSE.equals(user.getActive()))
-                .authorities(getAuthorities(user))
-                .build();
+        return new CustomUserDetails(
+                user.getId(),
+                user.getEmail(),
+                user.getPassword(),
+                Boolean.TRUE.equals(user.getActive()),
+                getAuthorities(user)
+        );
     }
 
     private List<GrantedAuthority> getAuthorities(User user) {

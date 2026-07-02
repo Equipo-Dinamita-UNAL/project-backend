@@ -49,7 +49,7 @@ public class LoginService {
     }
 
     @Transactional(readOnly = true)
-        public LoginResponse login(LoginRequest request){
+    public LoginResponse login(LoginRequest request){
 
         LoginResponse response = new LoginResponse();
 
@@ -61,6 +61,15 @@ public class LoginService {
                     "Credenciales inválidas"
             );
         }
+
+        // Bloquear el acceso si la cuenta fue desactivada (soft delete)
+        if (!Boolean.TRUE.equals(user.getActive())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Esta cuenta ha sido desactivada. Contacta a la administración de la clínica."
+            );
+        }
+
         response.setUserId(user.getId());
         setUserType(response, user.getId());
         setRoleAndPrivileges(response, user);
