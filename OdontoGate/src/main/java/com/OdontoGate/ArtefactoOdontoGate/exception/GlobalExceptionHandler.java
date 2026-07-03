@@ -1,5 +1,6 @@
 package com.OdontoGate.ArtefactoOdontoGate.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -36,8 +38,7 @@ public class GlobalExceptionHandler {
 
         @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneric(Exception ex) {
-            ex.printStackTrace();  // ← agrega esta línea
-
+            log.error("❌ Error interno no controlado en el servidor: ", ex);
         Map<String, String> error = new HashMap<>();
         error.put(ERROR_KEY, "Error interno del servidor");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
@@ -199,12 +200,12 @@ public ResponseEntity<Map<String, String>> handleDocumentNotOwner(
 
     @ExceptionHandler(MercadoPagoIntegrationException.class)
     public ResponseEntity<Map<String, String>> handleMercadoPagoException(MercadoPagoIntegrationException ex) {
-        Map<String, String> response = new HashMap<>();
+        log.error("💳 Error de integración con Mercado Pago: {}", ex.getMessage(), ex);
 
+        Map<String, String> response = new HashMap<>();
         response.put(ERROR_KEY, "Error en la pasarela de pagos");
         response.put("message", ex.getMessage());
 
-        // Retorna un HTTP 503 (Service Unavailable)
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
     }
 

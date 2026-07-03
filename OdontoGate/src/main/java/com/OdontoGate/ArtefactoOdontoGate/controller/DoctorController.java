@@ -1,6 +1,7 @@
 package com.OdontoGate.ArtefactoOdontoGate.controller;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.response.DoctorPatientResponse;
+import com.OdontoGate.ArtefactoOdontoGate.dto.response.DoctorSummaryResponse;
 import com.OdontoGate.ArtefactoOdontoGate.service.DoctorService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class DoctorController {
 
     private final DoctorService doctorService;
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR', 'PATIENT', 'DOCTOR')")
+    public ResponseEntity<List<DoctorSummaryResponse>> getAllDoctors() {
+        return ResponseEntity.ok(doctorService.getAllDoctors());
+    }
 
     @GetMapping("/{doctorId}/patients")
     @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('DOCTOR_VER_PACIENTES_AGENDADOS')")

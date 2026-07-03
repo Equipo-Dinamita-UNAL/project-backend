@@ -27,5 +27,7 @@ jwt:
   expiration-minutes: 120
 
 mercadopago:
-  access-token: "APP_USR-7426774784956572-062221-e1e7c4daaf0f7bd8305914207256be3f-3492860872"
-
+  currency: "COP"
+  access-token: "APP_USR-7426774784956572-062221-e1e7c4daaf0f7bd8305914207256be3f-3492860872" # 👈 Pega aquí tu token real de pruebas
+  webhook:
+    url: "https://cloak-unblended-reverence.ngrok-free.dev/api/payment/webhook" # 👈 Tu URL actual de Ngrok

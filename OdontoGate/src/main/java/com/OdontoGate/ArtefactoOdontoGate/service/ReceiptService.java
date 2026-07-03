@@ -2,15 +2,16 @@ package com.OdontoGate.ArtefactoOdontoGate.service;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.request.ReceiptRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.response.ReceiptResponse;
-import com.OdontoGate.ArtefactoOdontoGate.event.PaymentApprovedEvent;
 import com.OdontoGate.ArtefactoOdontoGate.exception.ReceiptExceptions;
 import com.OdontoGate.ArtefactoOdontoGate.model.*;
 import com.OdontoGate.ArtefactoOdontoGate.repository.PaymentRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.ReceiptRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,70 +23,66 @@ public class ReceiptService {
     private final PaymentRepository paymentRepository;
     private final PdfService pdfService;
 
-    // Generar comprobante
-        public ReceiptResponse createReceipt(ReceiptRequest request) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public ReceiptResponse createReceipt(ReceiptRequest request) {
+        Payment payment = findPaymentOrThrow(request.getPaymentId());
+        validatePaymentIsPaid(payment);
+        validateNoExistingReceipt(request.getPaymentId());
 
-        // 1. Verificar que el pago existe
-        Payment payment = paymentRepository.findById(request.getPaymentId())
-                .orElseThrow(() -> new ReceiptExceptions.PaymentNotFoundException(request.getPaymentId()));
+        Receipt savedReceipt = buildAndSaveReceipt(payment, request.getType());
 
-        // 2. Verificar que el pago está pagado
-        if (!payment.getStatus().equals("PAGADO")) {
+        return mapToResponse(savedReceipt);
+    }
+
+    private Payment findPaymentOrThrow(Integer paymentId) {
+        return paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new ReceiptExceptions.PaymentNotFoundException(paymentId));
+    }
+
+    private void validatePaymentIsPaid(Payment payment) {
+        boolean esIgual = "PAGADO".equals(payment.getStatus());
+
+        if (!esIgual) {
             throw new ReceiptExceptions.PaymentNotPaidException();
         }
+    }
 
-        // 3. Verificar que no tiene comprobante
-        receiptRepository.findByPaymentId(request.getPaymentId())
+    private void validateNoExistingReceipt(Integer paymentId) {
+        receiptRepository.findByPaymentId(paymentId)
                 .ifPresent(r -> { throw new ReceiptExceptions.ReceiptAlreadyExistsException(); });
+    }
 
-        // 4. Crear comprobante
+    private Receipt buildAndSaveReceipt(Payment payment, String type) {
         Receipt receipt = new Receipt();
         receipt.setPayment(payment);
-        receipt.setType(request.getType());
+        receipt.setType(type);
         receipt.setReceiptNumber("REC-" + System.currentTimeMillis());
         receipt.setIssueDate(LocalDateTime.now());
         receipt.setCreatedAt(LocalDateTime.now());
-
-        return mapToResponse(receiptRepository.save(receipt));
+        return receiptRepository.save(receipt);
     }
 
-    // Obtener comprobante por pago
         public ReceiptResponse getReceiptByPayment(Integer paymentId) {
         Receipt receipt = receiptRepository.findByPaymentId(paymentId)
                 .orElseThrow(() -> new RuntimeException("Comprobante no encontrado"));
         return mapToResponse(receipt);
     }
 
-    // Obtener comprobante por id
         public ReceiptResponse getReceiptById(Integer id) {
         Receipt receipt = receiptRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Comprobante no encontrado"));
         return mapToResponse(receipt);
     }
-
-    // Este metodo se dispara SOLO cuando alguien publica un PaymentApprovedEvent
-    @EventListener
-    public void handlePaymentApproved(PaymentApprovedEvent event) {
-        ReceiptRequest receiptReq = new ReceiptRequest();
-        receiptReq.setPaymentId(event.getPaymentId());
-        receiptReq.setType("ELECTRONICO");
-        this.createReceipt(receiptReq);
-    }
-
-    public byte[] getReceiptPdfBytes(Integer id) throws Exception {
-        // 1. Buscamos la info usando tu lógica actual
+    
+    public byte[] getReceiptPdfBytes(Integer id) throws IOException {
         ReceiptResponse receiptInfo = this.getReceiptById(id);
 
-        // 2. Metemos la info en un mapa genérico.
-        // La clave "receipt" debe coincidir con como lo llamas en el HTML: th:text="${receipt.monto}"
         Map<String, Object> data = new HashMap<>();
         data.put("receipt", receiptInfo);
 
-        // 3. Le pedimos al motor que genere el PDF usando la plantilla "recibo"
         return pdfService.generatePdf("receipt", data);
     }
 
-    // Mapeo
     private ReceiptResponse mapToResponse(Receipt receipt) {
         Payment payment = receipt.getPayment();
         Appointment appointment = payment.getAppointment();
@@ -106,8 +103,7 @@ public class ReceiptService {
         response.setPatientLastname(patient.getLastname());
         response.setAmount(payment.getAmount());
         response.setPaymentMethod(payment.getMethod());
-        response.setGatewayReference(payment.getGatewayReference()); // será null si fue presencial
-
+        response.setGatewayReference(payment.getGatewayReference());
         return response;
     }
 }

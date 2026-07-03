@@ -5,29 +5,33 @@ import com.OdontoGate.ArtefactoOdontoGate.dto.response.ScheduleResponse;
 import com.OdontoGate.ArtefactoOdontoGate.exception.ScheduleExceptions;
 import com.OdontoGate.ArtefactoOdontoGate.model.Doctor;
 import com.OdontoGate.ArtefactoOdontoGate.model.Schedule;
+import com.OdontoGate.ArtefactoOdontoGate.repository.DoctorRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalTime;
 import java.util.List;
-
 
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
+    private final DoctorRepository doctorRepository;
 
-        public ScheduleResponse create(ScheduleRequest request) {
+    public ScheduleResponse create(ScheduleRequest request) {
+        Doctor doctor = doctorRepository.findById(request.getDoctorId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Doctor no encontrado con ID: " + request.getDoctorId()));
+
         Schedule schedule = new Schedule();
         schedule.setWeekday(request.getWeekday());
         schedule.setStartTime(request.getStartTime());
         schedule.setEndTime(request.getEndTime());
         schedule.setIsAvailable(request.getIsAvailable());
-
-        Doctor doctor = new Doctor();
-        doctor.setId(request.getDoctorId());
         schedule.setDoctor(doctor);
 
         validarHorario(request.getStartTime(), request.getEndTime());
@@ -36,40 +40,32 @@ public class ScheduleService {
         return toResponse(saved);
     }
 
-        public List<ScheduleResponse> getAll() {
+    public List<ScheduleResponse> getAll() {
         return scheduleRepository.findAll()
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-        public List<ScheduleResponse> getByDoctor(Integer doctorId) {
+    public List<ScheduleResponse> getByDoctor(Integer doctorId) {
         return scheduleRepository.findByDoctorId(doctorId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-        public void delete(Integer id) {
+    public void delete(Integer id) {
         scheduleRepository.deleteById(id);
     }
 
-        public ScheduleResponse update(Integer id, ScheduleRequest request) {
+    public ScheduleResponse update(Integer id, ScheduleRequest request) {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
 
-        if (request.getWeekday() != null) {
-            schedule.setWeekday(request.getWeekday());
-        }
-        if (request.getStartTime() != null) {
-            schedule.setStartTime(request.getStartTime());
-        }
-        if (request.getEndTime() != null) {
-            schedule.setEndTime(request.getEndTime());
-        }
-        if (request.getIsAvailable() != null) {
-            schedule.setIsAvailable(request.getIsAvailable());
-        }
+        if (request.getWeekday() != null) schedule.setWeekday(request.getWeekday());
+        if (request.getStartTime() != null) schedule.setStartTime(request.getStartTime());
+        if (request.getEndTime() != null) schedule.setEndTime(request.getEndTime());
+        if (request.getIsAvailable() != null) schedule.setIsAvailable(request.getIsAvailable());
 
         LocalTime startFinal = request.getStartTime() != null ? request.getStartTime() : schedule.getStartTime();
         LocalTime endFinal = request.getEndTime() != null ? request.getEndTime() : schedule.getEndTime();
@@ -80,7 +76,7 @@ public class ScheduleService {
         return toResponse(saved);
     }
 
-        public ScheduleResponse setAvailable(Integer id, Boolean available) {
+    public ScheduleResponse setAvailable(Integer id, Boolean available) {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
 

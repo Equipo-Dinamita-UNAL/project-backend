@@ -25,21 +25,18 @@ public class ReceiptController {
         this.receiptService = receiptService;
     }
 
-    // Generar comprobante - POST
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @PostMapping
     public ResponseEntity<ReceiptResponse> createReceipt(@Valid @RequestBody ReceiptRequest request) {
         return ResponseEntity.status(201).body(receiptService.createReceipt(request));
     }
 
-    // Obtener comprobante por pago - GET
     @PreAuthorize("hasAnyRole('ADMINISTRATOR', 'PATIENT', 'DOCTOR')")
     @GetMapping("/pago/{paymentId}")
     public ResponseEntity<ReceiptResponse> getReceiptByPayment(@PathVariable Integer paymentId) {
         return ResponseEntity.ok(receiptService.getReceiptByPayment(paymentId));
     }
 
-    // Obtener comprobante por id - GET
     @PreAuthorize("hasAnyRole('ADMINISTRATOR', 'PATIENT', 'DOCTOR')")
     @GetMapping("/{id}")
     public ResponseEntity<ReceiptResponse> getReceiptById(@PathVariable Integer id) {

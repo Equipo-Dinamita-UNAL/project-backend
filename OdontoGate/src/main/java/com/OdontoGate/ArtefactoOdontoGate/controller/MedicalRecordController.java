@@ -78,6 +78,7 @@ public class MedicalRecordController {
     }
 
     @GetMapping("/patient/{patientId}")
+<<<<<<< HEAD
     @PreAuthorize("hasRole('ADMINISTRATOR') "
             + "or hasAuthority('DOCTOR_LEER_HISTORIA_CLINICA') "
             + "or hasAuthority('PATIENT_LEER_CITA')")
@@ -92,6 +93,15 @@ public class MedicalRecordController {
                 throw new MedicalRecordExceptions.PatientNotOwnerException();
             }
         }
+=======
+    @PreAuthorize(
+            "hasRole('ADMINISTRATOR') " +
+                    "or hasAuthority('DOCTOR_LEER_HISTORIA_CLINICA') " +
+                    "or (hasRole('PATIENT') and #patientId == authentication.principal.id)"
+    )
+    public List<MedicalRecordResponse> findByPatient(
+            @PathVariable Integer patientId) {
+>>>>>>> 7942561dfdf7b47854347f4d793fea3e1b875aba
         return service.findByPatient(patientId);
     }
 

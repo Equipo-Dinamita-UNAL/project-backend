@@ -59,18 +59,22 @@ public class RolePrivilegeSeeder implements CommandLineRunner {
     }
 
     private void createRoleIfAbsent(String roleName, List<String> privilegeNames) {
-        if (roleRepository.existsByNombre(roleName)) {
-            return;
+        // 1. Buscamos el rol ignorando si está en mayúsculas o minúsculas
+        Optional<Role> existingRole = roleRepository.findByNombreIgnoreCase(roleName);
+
+        if (existingRole.isPresent()) {
+            return; // Si ya existe en el Docker de alguien, se lo salta de forma segura
         }
 
+        // 2. Si no existe, lo crea desde cero de forma limpia
         Role role = new Role();
-        role.setNombre(roleName);
+        role.setNombre(roleName.toLowerCase());
 
         List<Privilege> privileges = privilegeNames.stream()
                 .map(privilegeName -> buildPrivilege(role, privilegeName))
                 .toList();
 
-        role.getPrivileges().addAll(privileges);
+        role.setPrivileges(new java.util.ArrayList<>(privileges));
         roleRepository.save(role);
     }
 

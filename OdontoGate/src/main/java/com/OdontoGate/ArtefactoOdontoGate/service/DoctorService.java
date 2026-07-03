@@ -2,7 +2,9 @@ package com.OdontoGate.ArtefactoOdontoGate.service;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.response.AppointmentResponse;
 import com.OdontoGate.ArtefactoOdontoGate.dto.response.DoctorPatientResponse;
+import com.OdontoGate.ArtefactoOdontoGate.dto.response.DoctorSummaryResponse;
 import com.OdontoGate.ArtefactoOdontoGate.model.Appointment;
+import com.OdontoGate.ArtefactoOdontoGate.model.Doctor;
 import com.OdontoGate.ArtefactoOdontoGate.model.Patient;
 import com.OdontoGate.ArtefactoOdontoGate.repository.AppointmentRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.DoctorRepository;
@@ -19,6 +21,13 @@ public class DoctorService {
 
     private final DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
+
+    public List<DoctorSummaryResponse> getAllDoctors() {
+        return doctorRepository.findAll().stream()
+                .filter(d -> Boolean.TRUE.equals(d.getActive()))
+                .map(this::toDoctorSummaryResponse)
+                .toList();
+    }
 
     public List<DoctorPatientResponse> getScheduledPatients(Integer doctorId) {
         if (!doctorRepository.existsById(doctorId)) {
@@ -38,6 +47,21 @@ public class DoctorService {
                 });
 
         return new ArrayList<>(patientsById.values());
+    }
+
+    private DoctorSummaryResponse toDoctorSummaryResponse(Doctor doctor) {
+        DoctorSummaryResponse response = new DoctorSummaryResponse();
+        response.setId(doctor.getId());
+        response.setName(doctor.getName());
+        response.setLastname(doctor.getLastname());
+        response.setEmail(doctor.getEmail());
+        response.setPhone(doctor.getPhone());
+        response.setActive(doctor.getActive());
+        response.setCreatedAt(doctor.getCreatedAt());
+        response.setSpeciality(doctor.getSpeciality());
+        response.setMedicalLicense(doctor.getMedicalLicense());
+        response.setPhotoUrl(doctor.getPhotoUrl());
+        return response;
     }
 
     private DoctorPatientResponse toDoctorPatientResponse(Patient patient) {
