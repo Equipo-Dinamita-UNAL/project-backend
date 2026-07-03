@@ -16,4 +16,5 @@ public class PaymentResponse {
     private String patientName;
     private String patientLastname;
     private String checkoutUrl;
+    private Integer appointmentId;
 }

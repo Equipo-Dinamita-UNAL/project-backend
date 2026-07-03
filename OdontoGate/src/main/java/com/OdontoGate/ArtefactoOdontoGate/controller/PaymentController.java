@@ -81,5 +81,10 @@ public class PaymentController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasRole('PATIENT')")
+    @PostMapping("/{id}/retry")
+    public ResponseEntity<PaymentResponse> retryPayment(@PathVariable Integer id) {
+        return ResponseEntity.ok(paymentService.retryPayment(id));
+    }
 
 }
