@@ -17,7 +17,6 @@ import com.OdontoGate.ArtefactoOdontoGate.repository.ScheduleRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.TreatmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.time.DayOfWeek;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalTime;

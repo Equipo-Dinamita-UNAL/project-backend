@@ -2,25 +2,19 @@ package com.OdontoGate.ArtefactoOdontoGate.service;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Request.MedicalRecordRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses.MedicalRecordResponse;
-<<<<<<< HEAD
-=======
 import com.OdontoGate.ArtefactoOdontoGate.model.MedicalRecord;
 import com.OdontoGate.ArtefactoOdontoGate.model.Patient;
->>>>>>> 7942561dfdf7b47854347f4d793fea3e1b875aba
 import com.OdontoGate.ArtefactoOdontoGate.exception.MedicalRecordExceptions;
 import com.OdontoGate.ArtefactoOdontoGate.model.MedicalRecord;
 import com.OdontoGate.ArtefactoOdontoGate.repository.MedicalRecordRepository;
-<<<<<<< HEAD
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
-=======
 import com.OdontoGate.ArtefactoOdontoGate.repository.PatientRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
->>>>>>> 7942561dfdf7b47854347f4d793fea3e1b875aba
+
 import java.util.List;
 import java.util.Map;
 
@@ -29,19 +23,12 @@ import java.util.Map;
 public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     private final MedicalRecordRepository repository;
-<<<<<<< HEAD
+
     private final PdfService pdfService;
 
-=======
     private final PatientRepository patientRepository;
+        
 
-    public MedicalRecordServiceImpl(MedicalRecordRepository repository,
-                                    PatientRepository patientRepository) {
-        this.repository = repository;
-        this.patientRepository = patientRepository;
-    }
-
->>>>>>> 7942561dfdf7b47854347f4d793fea3e1b875aba
     @Override
     public MedicalRecordResponse create(MedicalRecordRequest request) {
 
