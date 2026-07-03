@@ -31,7 +31,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                // Configuración explícita de CORS para permitir peticiones desde React (Vite)
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOrigins(List.of("http://localhost:5173"));
@@ -44,11 +43,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Permitir todas las peticiones previas de verificación (Preflight OPTIONS)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login/change-password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        // MercadoPago no manda JWT — debe poder llegar sin autenticación
+                        .requestMatchers(HttpMethod.POST, "/api/payment/webhook").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(
                         jwtAuthenticationFilter,

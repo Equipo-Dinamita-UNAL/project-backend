@@ -86,8 +86,13 @@ public class PaymentService {
     }
 
     private void validateNoExistingPayment(Integer appointmentId) {
-        paymentRepository.findByAppointmentId(appointmentId)
-                .ifPresent(p -> { throw new PaymentExceptions.PaymentAlreadyExistsException(); });
+        paymentRepository.findByAppointmentId(appointmentId).ifPresent(p -> {
+            if (STATUS_PAGADO.equals(p.getStatus())) {
+                throw new PaymentExceptions.PaymentAlreadyExistsException();
+            }
+            log.info("Eliminando pago PENDIENTE huérfano #{} de la cita #{} para permitir reintento", p.getId(), appointmentId);
+            paymentRepository.delete(p);
+        });
     }
 
     private BigDecimal calculateCorrectAmount(Appointment appointment, BigDecimal requestedAmount) {
@@ -230,6 +235,27 @@ public class PaymentService {
                 .toList();
     }
 
+    @Transactional
+    public PaymentResponse retryPayment(Integer id) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
+
+        if (!"PENDIENTE".equals(payment.getStatus())) {
+            throw new RuntimeException("Solo se pueden reintentar pagos en estado PENDIENTE");
+        }
+
+        // Regenera un nuevo checkoutUrl desde MercadoPago sin crear un nuevo registro
+        String checkoutUrl = paymentGateway.generateCheckoutUrl(
+                payment.getId().toString(),
+                payment.getAmount(),
+                "Cita odontológica"
+        );
+
+        PaymentResponse response = mapToResponse(payment);
+        response.setCheckoutUrl(checkoutUrl);
+        return response;
+    }
+
     private PaymentResponse mapToResponse(Payment payment) {
         PaymentResponse response = new PaymentResponse();
         response.setId(payment.getId());
@@ -240,6 +266,7 @@ public class PaymentService {
         response.setCreatedAt(payment.getCreatedAt());
         response.setPatientName(payment.getAppointment().getPatient().getName());
         response.setPatientLastname(payment.getAppointment().getPatient().getLastname());
+        response.setAppointmentId(payment.getAppointment().getId());
         return response;
     }
 }
