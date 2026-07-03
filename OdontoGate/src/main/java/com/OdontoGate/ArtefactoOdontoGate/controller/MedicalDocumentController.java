@@ -44,7 +44,7 @@ public class MedicalDocumentController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('DOCTOR_CREAR_HISTORIA_CLINICA')")
+    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('DOCTOR_CREAR_HISTORIA_CLINICA') or hasRole('PATIENT')")
     public MedicalDocumentResponse upload(
             @RequestParam("file") MultipartFile file,
             @RequestParam("patientId") Integer patientId,

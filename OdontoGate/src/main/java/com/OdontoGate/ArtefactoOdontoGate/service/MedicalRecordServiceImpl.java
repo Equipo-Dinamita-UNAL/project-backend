@@ -5,14 +5,13 @@ import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses.MedicalRec
 import com.OdontoGate.ArtefactoOdontoGate.model.MedicalRecord;
 import com.OdontoGate.ArtefactoOdontoGate.model.Patient;
 import com.OdontoGate.ArtefactoOdontoGate.exception.MedicalRecordExceptions;
-import com.OdontoGate.ArtefactoOdontoGate.model.MedicalRecord;
 import com.OdontoGate.ArtefactoOdontoGate.repository.MedicalRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import com.OdontoGate.ArtefactoOdontoGate.repository.PatientRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
+
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -97,7 +96,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         Map<String, Object> data = new HashMap<>();
         data.put("record", record);
 
-        return pdfService.generatePdf("medical-record", data);
+        return pdfService.generatePdf("MedicalRecordDownload", data);
     }
 
     private MedicalRecordResponse toResponse(MedicalRecord medicalRecord) {
