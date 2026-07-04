@@ -79,14 +79,16 @@ export default function UsersPage({ userRole }) {
         .catch(() => alert('No se pudo crear el usuario. Verifica los datos o si el correo ya existe.'));
   };
 
-  const handleDeleteUser = (email) => {
-    if (!window.confirm(`Seguro que deseas eliminar al usuario con correo ${email}?`)) return;
+  const handleToggleStatus = (email, currentStatus) => {
+    const action = currentStatus ? 'desactivar' : 'activar';
+    if (!window.confirm(`¿Seguro que deseas ${action} al usuario con correo ${email}?`)) return;
+
     deleteUserAdmin(email)
         .then(() => {
-          alert('Usuario eliminado correctamente.');
-          loadUsers();
+          alert(`Usuario ${action}do correctamente.`);
+          loadUsers(); // Recarga la lista para ver el cambio de color
         })
-        .catch(() => alert('No se pudo eliminar el usuario.'));
+        .catch(() => alert(`No se pudo ${action} el usuario.`));
   };
 
   const inputStyle = { padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1' };
@@ -234,10 +236,19 @@ export default function UsersPage({ userRole }) {
                         </td>
                         <td style={{ padding: '12px' }}>
                           <button
-                              onClick={() => handleDeleteUser(u.email)}
-                              style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                              onClick={() => handleToggleStatus(u.email, u.active)}
+                              style={{
+                                padding: '6px 12px',
+                                fontSize: '12px',
+                                backgroundColor: u.active ? '#ef4444' : '#10b981',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontWeight: 'bold'
+                              }}
                           >
-                            Eliminar
+                            {u.active ? 'Desactivar' : 'Activar'}
                           </button>
                         </td>
                       </tr>

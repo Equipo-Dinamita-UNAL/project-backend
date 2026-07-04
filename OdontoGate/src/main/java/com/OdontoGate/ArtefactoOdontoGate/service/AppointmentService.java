@@ -35,6 +35,11 @@ public class AppointmentService {
         Patient patient = patientRepository.findById(request.getPatientId())
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
 
+        // 🛑 NUEVA VALIDACIÓN: Paciente inactivo
+        if (!Boolean.TRUE.equals(patient.getActive())) {
+            throw new RuntimeException("No se puede agendar la cita: el paciente se encuentra inactivo.");
+        }
+
         Doctor doctor = doctorRepository.findById(request.getDoctorId())
                 .orElseThrow(() -> new RuntimeException("Doctor no encontrado"));
 
