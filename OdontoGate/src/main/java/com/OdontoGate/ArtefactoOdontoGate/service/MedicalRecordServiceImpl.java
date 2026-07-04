@@ -6,23 +6,27 @@ import com.OdontoGate.ArtefactoOdontoGate.model.MedicalRecord;
 import com.OdontoGate.ArtefactoOdontoGate.model.Patient;
 import com.OdontoGate.ArtefactoOdontoGate.exception.MedicalRecordExceptions;
 import com.OdontoGate.ArtefactoOdontoGate.repository.MedicalRecordRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import java.util.HashMap;
 import com.OdontoGate.ArtefactoOdontoGate.repository.PatientRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
+
 import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     private final MedicalRecordRepository repository;
-    private final PatientRepository patientRepository;
 
-    public MedicalRecordServiceImpl(MedicalRecordRepository repository,
-                                    PatientRepository patientRepository) {
-        this.repository = repository;
-        this.patientRepository = patientRepository;
-    }
+    private final PdfService pdfService;
+
+    private final PatientRepository patientRepository;
+        
 
     @Override
     public MedicalRecordResponse create(MedicalRecordRequest request) {
@@ -83,6 +87,16 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
             throw new MedicalRecordExceptions.NotFoundException(id);
         }
         repository.deleteById(id);
+    }
+
+    @Override
+    public byte[] getMedicalRecordPdfBytes(Integer id) throws Exception {
+        MedicalRecordResponse record = this.findById(id);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("record", record);
+
+        return pdfService.generatePdf("MedicalRecordDownload", data);
     }
 
     private MedicalRecordResponse toResponse(MedicalRecord medicalRecord) {

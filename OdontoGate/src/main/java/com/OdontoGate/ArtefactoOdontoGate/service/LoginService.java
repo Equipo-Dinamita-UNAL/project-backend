@@ -11,7 +11,6 @@ import com.OdontoGate.ArtefactoOdontoGate.model.Role;
 import com.OdontoGate.ArtefactoOdontoGate.model.User;
 import com.OdontoGate.ArtefactoOdontoGate.model.UserType;
 
-
 import com.OdontoGate.ArtefactoOdontoGate.repository.UserRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.AdministratorRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.DoctorRepository;

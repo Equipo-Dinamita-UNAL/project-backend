@@ -155,14 +155,15 @@ public class UserService {
             );
         }
 
-        // Soft delete: en vez de borrar físicamente (lo cual falla si el usuario
-        // tiene registros relacionados, como citas o historial clínico), se
-        // desactiva la cuenta. Esto preserva la integridad referencial y el
-        // historial clínico/de citas para auditoría y trazabilidad.
-        user.setActive(false);
+        // Interruptor bidireccional: Invierte el estado actual
+        boolean estadoActual = user.getActive() != null ? user.getActive() : false;
+        user.setActive(!estadoActual);
+
         userRepository.save(user);
 
-        response.setMensaje("Usuario desactivado correctamente.");
+        // Mensaje dinámico según el nuevo estado
+        String accion = user.getActive() ? "activado" : "desactivado";
+        response.setMensaje("Usuario " + accion + " correctamente.");
         response.setEmail(request.getEmail());
 
         return response;

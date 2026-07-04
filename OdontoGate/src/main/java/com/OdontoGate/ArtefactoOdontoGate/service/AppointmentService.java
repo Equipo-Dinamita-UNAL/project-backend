@@ -17,7 +17,6 @@ import com.OdontoGate.ArtefactoOdontoGate.repository.ScheduleRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.TreatmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.time.DayOfWeek;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -35,6 +34,11 @@ public class AppointmentService {
     public AppointmentResponse create(AppointmentRequest request) {
         Patient patient = patientRepository.findById(request.getPatientId())
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+
+        // 🛑 NUEVA VALIDACIÓN: Paciente inactivo
+        if (!Boolean.TRUE.equals(patient.getActive())) {
+            throw new RuntimeException("No se puede agendar la cita: el paciente se encuentra inactivo.");
+        }
 
         Doctor doctor = doctorRepository.findById(request.getDoctorId())
                 .orElseThrow(() -> new RuntimeException("Doctor no encontrado"));

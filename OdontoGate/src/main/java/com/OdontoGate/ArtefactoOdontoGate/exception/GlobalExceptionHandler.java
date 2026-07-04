@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.time.LocalDateTime;
 
@@ -148,6 +148,55 @@ public class GlobalExceptionHandler {
         error.put(ERROR_KEY, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+public ResponseEntity<Map<String, String>> handleMaxUploadSize(
+        MaxUploadSizeExceededException ex) {
+    Map<String, String> error = new HashMap<>();
+    error.put(ERROR_KEY, "El archivo excede el tamaño máximo permitido de 10 MB");
+    return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(error);
+}
+
+@ExceptionHandler(MedicalDocumentExceptions.NotFoundException.class)
+public ResponseEntity<Map<String, String>> handleDocumentNotFound(
+        MedicalDocumentExceptions.NotFoundException ex) {
+    Map<String, String> error = new HashMap<>();
+    error.put(ERROR_KEY, ex.getMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+}
+
+@ExceptionHandler(MedicalDocumentExceptions.InvalidFileTypeException.class)
+public ResponseEntity<Map<String, String>> handleInvalidFileType(
+        MedicalDocumentExceptions.InvalidFileTypeException ex) {
+    Map<String, String> error = new HashMap<>();
+    error.put(ERROR_KEY, ex.getMessage());
+    return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(error);
+}
+
+@ExceptionHandler(MedicalDocumentExceptions.FileSizeExceededException.class)
+public ResponseEntity<Map<String, String>> handleFileSizeExceeded(
+        MedicalDocumentExceptions.FileSizeExceededException ex) {
+    Map<String, String> error = new HashMap<>();
+    error.put(ERROR_KEY, ex.getMessage());
+    return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(error);
+}
+
+@ExceptionHandler(MedicalDocumentExceptions.FileStorageException.class)
+public ResponseEntity<Map<String, String>> handleFileStorage(
+        MedicalDocumentExceptions.FileStorageException ex) {
+    Map<String, String> error = new HashMap<>();
+    error.put(ERROR_KEY, ex.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+}
+
+@ExceptionHandler(MedicalDocumentExceptions.PatientNotOwnerException.class)
+public ResponseEntity<Map<String, String>> handleDocumentNotOwner(
+        MedicalDocumentExceptions.PatientNotOwnerException ex) {
+    Map<String, String> error = new HashMap<>();
+    error.put(ERROR_KEY, ex.getMessage());
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+}
+    
 
     @ExceptionHandler(MercadoPagoIntegrationException.class)
     public ResponseEntity<Map<String, String>> handleMercadoPagoException(MercadoPagoIntegrationException ex) {
