@@ -15,8 +15,8 @@ import com.OdontoGate.ArtefactoOdontoGate.repository.UserRepository;
 import com.OdontoGate.ArtefactoOdontoGate.security.JwtService;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,17 +29,20 @@ public class LoginService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
     private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     public LoginService(UserRepository userRepository,
                         AdministratorRepository administratorRepository,
                         PatientRepository patientRepository,
                         DoctorRepository doctorRepository,
-                        JwtService jwtService) {
+                        JwtService jwtService,
+                        PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.administratorRepository = administratorRepository;
         this.patientRepository = patientRepository;
         this.doctorRepository = doctorRepository;
         this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
@@ -76,13 +79,13 @@ public class LoginService {
                         HttpStatus.NOT_FOUND,
                         "Usuario autenticado no encontrado."));
 
-        if (!Objects.equals(request.getOldPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "La contraseÃ±a actual no es correcta.");
         }
 
-        user.setPassword(request.getNewPassword());
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
 
         ChangePasswordResponse response = new ChangePasswordResponse();
@@ -91,10 +94,15 @@ public class LoginService {
     }
 
     private User findUserByCredentials(LoginRequest request) {
-        return userRepository.findByEmailAndPassword(
-                request.getEmail(),
-                request.getPassword()
-        );
+        User user = userRepository.findByEmail(request.getEmail());
+
+        if (user == null || !passwordEncoder.matches(
+                request.getPassword(),
+                user.getPassword())) {
+            return null;
+        }
+
+        return user;
     }
 
     private void setUserType(LoginResponse response, Integer userId) {

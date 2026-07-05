@@ -20,6 +20,7 @@ import com.OdontoGate.ArtefactoOdontoGate.repository.DoctorRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.RoleRepository;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,16 +34,19 @@ public class UserService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
         public UserService(UserRepository userRepository, AdministratorRepository administratorRepository,
                        PatientRepository patientRepository, DoctorRepository doctorRepository,
-                       RoleRepository roleRepository) {
+                       RoleRepository roleRepository,
+                       PasswordEncoder passwordEncoder) {
 
         this.userRepository = userRepository;
         this.administratorRepository = administratorRepository;
         this.patientRepository = patientRepository;
         this.doctorRepository = doctorRepository;
         this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
         public UsuarioCreadoResponse createUser(CrearUsuarioRequest request) {
@@ -119,7 +123,7 @@ public class UserService {
         user.setName(request.getName());
         user.setLastname(request.getLastname());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhone(request.getPhone());
         user.setActive(true);
         user.setCreatedAt(LocalDateTime.now());

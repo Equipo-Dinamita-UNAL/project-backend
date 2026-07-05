@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,6 +40,9 @@ class LoginServiceTest {
     @Mock
     private JwtService jwtService;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private LoginService loginService;
 
@@ -51,11 +55,13 @@ class LoginServiceTest {
         User user = new User();
         user.setId(1);
         user.setEmail("doctor@test.com");
-        user.setPassword("123456");
+        user.setPassword("encoded-password");
         user.setActive(true);
 
-        when(userRepository.findByEmailAndPassword("doctor@test.com", "123456"))
+        when(userRepository.findByEmail("doctor@test.com"))
                 .thenReturn(user);
+        when(passwordEncoder.matches("123456", "encoded-password"))
+                .thenReturn(true);
 
         when(administratorRepository.existsById(1)).thenReturn(false);
         when(doctorRepository.existsById(1)).thenReturn(true);
@@ -79,11 +85,13 @@ class LoginServiceTest {
         User user = new User();
         user.setId(2);
         user.setEmail("patient@test.com");
-        user.setPassword("123456");
+        user.setPassword("encoded-password");
         user.setActive(true);
 
-        when(userRepository.findByEmailAndPassword("patient@test.com", "123456"))
+        when(userRepository.findByEmail("patient@test.com"))
                 .thenReturn(user);
+        when(passwordEncoder.matches("123456", "encoded-password"))
+                .thenReturn(true);
 
         when(administratorRepository.existsById(2)).thenReturn(false);
         when(doctorRepository.existsById(2)).thenReturn(false);
@@ -103,7 +111,7 @@ class LoginServiceTest {
         request.setEmail("noexiste@test.com");
         request.setPassword("incorrecta");
 
-        when(userRepository.findByEmailAndPassword("noexiste@test.com", "incorrecta"))
+        when(userRepository.findByEmail("noexiste@test.com"))
                 .thenReturn(null);
 
         ResponseStatusException exception = assertThrows(

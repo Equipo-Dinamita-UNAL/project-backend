@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -44,6 +45,9 @@ class UserServiceCreateTest {
     @Mock
     private RoleRepository roleRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private UserService userService;
 
@@ -62,6 +66,7 @@ class UserServiceCreateTest {
 
         when(userRepository.existsByEmail("doctor@test.com")).thenReturn(false);
         when(roleRepository.findByNombre("doctor")).thenReturn(Optional.of(buildRole("doctor")));
+        when(passwordEncoder.encode("123456")).thenReturn("encoded-123456");
 
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
             User user = invocation.getArgument(0);
@@ -80,7 +85,8 @@ class UserServiceCreateTest {
         assertTrue(response.getActive());
         assertEquals(UserType.DOCTOR, response.getUserType());
 
-        verify(userRepository, times(1)).save(any(User.class));
+        verify(userRepository, times(1))
+                .save(argThat(user -> "encoded-123456".equals(user.getPassword())));
     }
 
     @Test
@@ -98,6 +104,7 @@ class UserServiceCreateTest {
 
         when(userRepository.existsByEmail("patient@test.com")).thenReturn(false);
         when(roleRepository.findByNombre("patient")).thenReturn(Optional.of(buildRole("patient")));
+        when(passwordEncoder.encode("123456")).thenReturn("encoded-123456");
 
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
             User user = invocation.getArgument(0);
@@ -114,7 +121,8 @@ class UserServiceCreateTest {
         assertEquals(UserType.PATIENT, response.getUserType());
         assertTrue(response.getActive());
 
-        verify(userRepository, times(1)).save(any(User.class));
+        verify(userRepository, times(1))
+                .save(argThat(user -> "encoded-123456".equals(user.getPassword())));
     }
 
     @Test
