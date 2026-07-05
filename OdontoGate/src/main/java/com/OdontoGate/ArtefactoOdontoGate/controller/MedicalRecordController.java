@@ -3,10 +3,14 @@ package com.OdontoGate.ArtefactoOdontoGate.controller;
 import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Request.MedicalRecordRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses.MedicalRecordResponse;
 import com.OdontoGate.ArtefactoOdontoGate.dto.validation.OnCreate;
+import com.OdontoGate.ArtefactoOdontoGate.service.CurrentUserService;
 import com.OdontoGate.ArtefactoOdontoGate.service.MedicalRecordService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,20 +21,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import java.util.List;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/medical-records")
 public class MedicalRecordController {
 
     private final MedicalRecordService service;
+    private final CurrentUserService currentUserService;
 
-        public MedicalRecordController(MedicalRecordService service) {
+        public MedicalRecordController(MedicalRecordService service,
+                                       CurrentUserService currentUserService) {
         this.service = service;
+        this.currentUserService = currentUserService;
     }
 
         @PostMapping
@@ -71,7 +74,10 @@ public class MedicalRecordController {
     "or hasRole('PATIENT')")
     public ResponseEntity<byte[]> downloadPdf(@PathVariable Integer id) throws Exception {
 
-        byte[] pdfBytes = service.getMedicalRecordPdfBytes(id);
+        byte[] pdfBytes = service.getMedicalRecordPdfBytes(
+                id,
+                currentUserService.getCurrentUserId(),
+                currentUserService.isPatient());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);

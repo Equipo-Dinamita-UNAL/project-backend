@@ -52,6 +52,7 @@ class LoginServiceTest {
         user.setId(1);
         user.setEmail("doctor@test.com");
         user.setPassword("123456");
+        user.setActive(true);
 
         when(userRepository.findByEmailAndPassword("doctor@test.com", "123456"))
                 .thenReturn(user);
@@ -79,6 +80,7 @@ class LoginServiceTest {
         user.setId(2);
         user.setEmail("patient@test.com");
         user.setPassword("123456");
+        user.setActive(true);
 
         when(userRepository.findByEmailAndPassword("patient@test.com", "123456"))
                 .thenReturn(user);

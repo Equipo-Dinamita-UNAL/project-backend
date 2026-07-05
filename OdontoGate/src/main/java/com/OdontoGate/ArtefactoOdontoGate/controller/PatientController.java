@@ -28,14 +28,16 @@ public class PatientController {
     private final AppointmentService appointmentService;
 
     @GetMapping("/{patientId}/appointments")
-    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('PATIENT_LEER_CITA')")
+    @PreAuthorize("hasRole('ADMINISTRATOR') "
+            + "or (hasRole('PATIENT') and #patientId == authentication.principal.id)")
     public ResponseEntity<List<AppointmentResponse>> getAppointments(
             @PathVariable Integer patientId) {
         return ResponseEntity.ok(appointmentService.getByPatient(patientId));
     }
 
     @PostMapping("/{patientId}/doctors/{doctorId}/appointments")
-    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('PATIENT_CREAR_CITA')")
+    @PreAuthorize("hasRole('ADMINISTRATOR') "
+            + "or (hasRole('PATIENT') and #patientId == authentication.principal.id)")
     public ResponseEntity<AppointmentResponse> createAppointment(
             @PathVariable Integer patientId,
             @PathVariable Integer doctorId,
@@ -57,7 +59,8 @@ public class PatientController {
     }
 
     @DeleteMapping("/{patientId}/appointments/{appointmentId}")
-    @PreAuthorize("hasRole('ADMINISTRATOR') or hasAuthority('PATIENT_ELIMINAR_CITA')")
+    @PreAuthorize("hasRole('ADMINISTRATOR') "
+            + "or (hasRole('PATIENT') and #patientId == authentication.principal.id)")
     public ResponseEntity<Void> deleteAppointment(
             @PathVariable Integer patientId,
             @PathVariable Integer appointmentId) {

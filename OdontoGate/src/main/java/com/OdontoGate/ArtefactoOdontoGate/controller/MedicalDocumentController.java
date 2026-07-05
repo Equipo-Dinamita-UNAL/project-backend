@@ -1,8 +1,8 @@
 package com.OdontoGate.ArtefactoOdontoGate.controller;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses.MedicalDocumentResponse;
-import com.OdontoGate.ArtefactoOdontoGate.model.User;
-import com.OdontoGate.ArtefactoOdontoGate.repository.UserRepository;
+import com.OdontoGate.ArtefactoOdontoGate.exception.MedicalDocumentExceptions;
+import com.OdontoGate.ArtefactoOdontoGate.service.CurrentUserService;
 import com.OdontoGate.ArtefactoOdontoGate.service.MedicalDocumentService;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -11,9 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,12 +31,12 @@ import java.util.List;
 public class MedicalDocumentController {
 
     private final MedicalDocumentService service;
-    private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
 
     public MedicalDocumentController(MedicalDocumentService service,
-                                     UserRepository userRepository) {
+                                     CurrentUserService currentUserService) {
         this.service = service;
-        this.userRepository = userRepository;
+        this.currentUserService = currentUserService;
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -52,6 +49,7 @@ public class MedicalDocumentController {
             @RequestParam(value = "description", required = false) String description) {
 
         Integer uploadedBy = getCurrentUserId();
+        validatePatientOwnsRequestedId(patientId);
         return service.upload(file, patientId, medicalRecordId, description, uploadedBy);
     }
 
@@ -120,22 +118,17 @@ public class MedicalDocumentController {
     }
 
     private Integer getCurrentUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new IllegalStateException("Usuario no encontrado");
-        }
-        return user.getId();
+        return currentUserService.getCurrentUserId();
     }
 
     private String getCurrentUserRole() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .filter(a -> a.startsWith("ROLE_"))
-                .map(a -> a.replace("ROLE_", "").toLowerCase())
-                .findFirst()
-                .orElse("");
+        return currentUserService.getCurrentUserRole();
+    }
+
+    private void validatePatientOwnsRequestedId(Integer patientId) {
+        if (currentUserService.isPatient()
+                && !currentUserService.getCurrentUserId().equals(patientId)) {
+            throw new MedicalDocumentExceptions.PatientNotOwnerException();
+        }
     }
 }

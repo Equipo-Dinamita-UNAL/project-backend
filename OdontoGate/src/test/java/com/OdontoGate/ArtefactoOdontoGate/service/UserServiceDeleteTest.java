@@ -6,6 +6,7 @@ import com.OdontoGate.ArtefactoOdontoGate.model.User;
 import com.OdontoGate.ArtefactoOdontoGate.repository.AdministratorRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.DoctorRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.PatientRepository;
+import com.OdontoGate.ArtefactoOdontoGate.repository.RoleRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.UserRepository;
 
 import org.junit.jupiter.api.Test;
@@ -34,59 +35,60 @@ class UserServiceDeleteTest {
     @Mock
     private DoctorRepository doctorRepository;
 
+    @Mock
+    private RoleRepository roleRepository;
+
     @InjectMocks
     private UserService userService;
 
     @Test
-    void deleteUser_DeberiaEliminarDoctor_CuandoCorreoExiste() {
+    void deleteUser_DeberiaDesactivarDoctor_CuandoCorreoExiste() {
         DeleteUserRequest request = new DeleteUserRequest();
         request.setEmail("doctor@test.com");
 
         User user = new User();
         user.setId(1);
         user.setEmail("doctor@test.com");
+        user.setActive(true);
 
         when(userRepository.findByEmail("doctor@test.com")).thenReturn(user);
-        when(administratorRepository.existsById(1)).thenReturn(false);
-        when(patientRepository.existsById(1)).thenReturn(false);
-        when(doctorRepository.existsById(1)).thenReturn(true);
 
         DeleteUserResponse response = userService.deleteUser(request);
 
         assertNotNull(response);
-        assertEquals("Usuario eliminado correctamente.", response.getMensaje());
+        assertEquals("Usuario desactivado correctamente.", response.getMensaje());
         assertEquals("doctor@test.com", response.getEmail());
 
-        verify(doctorRepository, times(1)).deleteById(1);
+        verify(userRepository, times(1)).save(user);
+        verify(doctorRepository, never()).deleteById(1);
         verify(patientRepository, never()).deleteById(1);
         verify(administratorRepository, never()).deleteById(1);
-        verify(userRepository, times(1)).deleteById(1);
+        verify(userRepository, never()).deleteById(1);
     }
 
     @Test
-    void deleteUser_DeberiaEliminarPaciente_CuandoCorreoExiste() {
+    void deleteUser_DeberiaDesactivarPaciente_CuandoCorreoExiste() {
         DeleteUserRequest request = new DeleteUserRequest();
         request.setEmail("patient@test.com");
 
         User user = new User();
         user.setId(2);
         user.setEmail("patient@test.com");
+        user.setActive(true);
 
         when(userRepository.findByEmail("patient@test.com")).thenReturn(user);
-        when(administratorRepository.existsById(2)).thenReturn(false);
-        when(patientRepository.existsById(2)).thenReturn(true);
-        when(doctorRepository.existsById(2)).thenReturn(false);
 
         DeleteUserResponse response = userService.deleteUser(request);
 
         assertNotNull(response);
-        assertEquals("Usuario eliminado correctamente.", response.getMensaje());
+        assertEquals("Usuario desactivado correctamente.", response.getMensaje());
         assertEquals("patient@test.com", response.getEmail());
 
-        verify(patientRepository, times(1)).deleteById(2);
+        verify(userRepository, times(1)).save(user);
+        verify(patientRepository, never()).deleteById(2);
         verify(doctorRepository, never()).deleteById(2);
         verify(administratorRepository, never()).deleteById(2);
-        verify(userRepository, times(1)).deleteById(2);
+        verify(userRepository, never()).deleteById(2);
     }
 
     @Test
@@ -108,5 +110,6 @@ class UserServiceDeleteTest {
         verify(doctorRepository, never()).deleteById(anyInt());
         verify(patientRepository, never()).deleteById(anyInt());
         verify(administratorRepository, never()).deleteById(anyInt());
+        verify(userRepository, never()).save(any(User.class));
     }
 }

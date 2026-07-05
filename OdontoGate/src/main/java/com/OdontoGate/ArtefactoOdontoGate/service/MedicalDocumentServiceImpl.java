@@ -4,6 +4,7 @@ import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses.MedicalDoc
 import com.OdontoGate.ArtefactoOdontoGate.exception.MedicalDocumentExceptions;
 import com.OdontoGate.ArtefactoOdontoGate.model.MedicalDocument;
 import com.OdontoGate.ArtefactoOdontoGate.repository.MedicalDocumentRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,9 +38,9 @@ public class MedicalDocumentServiceImpl implements MedicalDocumentService {
             @Value("${app.storage.upload-dir:uploads/medical-documents}") String uploadDir) {
         this.repository = repository;
         this.storageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
-        initStorage();
     }
 
+    @PostConstruct
     private void initStorage() {
         try {
             Files.createDirectories(storageLocation);

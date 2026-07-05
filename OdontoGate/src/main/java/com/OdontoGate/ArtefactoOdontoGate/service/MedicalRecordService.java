@@ -18,4 +18,9 @@ public interface MedicalRecordService {
     void delete(Integer id);
 
     byte[] getMedicalRecordPdfBytes(Integer id) throws Exception;
+
+    byte[] getMedicalRecordPdfBytes(
+            Integer id,
+            Integer requestingUserId,
+            boolean patientRequester) throws Exception;
 }

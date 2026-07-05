@@ -2,6 +2,7 @@ package com.OdontoGate.ArtefactoOdontoGate.service;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.requests.CrearUsuarioRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.requests.DeleteUserRequest;
+import com.OdontoGate.ArtefactoOdontoGate.dto.Login.requests.RegisterPatientRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses.DeleteUserResponse;
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses.UsuarioCreadoResponse;
 
@@ -57,6 +58,21 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         return buildCreatedUserResponse(savedUser, request);
+    }
+
+    public UsuarioCreadoResponse registerPatient(RegisterPatientRequest request) {
+        CrearUsuarioRequest userRequest = new CrearUsuarioRequest();
+        userRequest.setName(request.getName());
+        userRequest.setLastname(request.getLastname());
+        userRequest.setEmail(request.getEmail());
+        userRequest.setPassword(request.getPassword());
+        userRequest.setPhone(request.getPhone());
+        userRequest.setUserType(UserType.PATIENT);
+        userRequest.setBirthDate(request.getBirthDate());
+        userRequest.setBloodType(request.getBloodType());
+        userRequest.setAllergies(request.getAllergies());
+        userRequest.setAddress(request.getAddress());
+        return createUser(userRequest);
     }
 
     private User buildUser(CrearUsuarioRequest request) {

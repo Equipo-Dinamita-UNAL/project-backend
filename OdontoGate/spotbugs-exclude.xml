@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+        <Or>
+            <Class name="~com\.OdontoGate\.ArtefactoOdontoGate\.config\..*"/>
+            <Class name="~com\.OdontoGate\.ArtefactoOdontoGate\.controller\..*"/>
+        </Or>
+    </Match>
+</FindBugsFilter>

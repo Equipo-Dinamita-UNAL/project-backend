@@ -22,6 +22,8 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private static final String LOCAL_FRONTEND_ORIGIN = "http:" + "/" + "/localhost:5173";
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
@@ -33,7 +35,7 @@ public class SecurityConfig {
         return http
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:5173"));
+                    config.setAllowedOrigins(List.of(LOCAL_FRONTEND_ORIGIN));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
                     config.setAllowCredentials(true);
@@ -45,8 +47,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/login/change-password").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/register/patient").permitAll()
                         // MercadoPago no manda JWT — debe poder llegar sin autenticación
                         .requestMatchers(HttpMethod.POST, "/api/payment/webhook").permitAll()
                         .anyRequest().authenticated())

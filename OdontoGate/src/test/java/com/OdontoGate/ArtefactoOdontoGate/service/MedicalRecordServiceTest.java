@@ -4,7 +4,9 @@ import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Request.MedicalRecor
 import com.OdontoGate.ArtefactoOdontoGate.dto.MedicalRecord.Responses.MedicalRecordResponse;
 import com.OdontoGate.ArtefactoOdontoGate.exception.MedicalRecordExceptions.NotFoundException;
 import com.OdontoGate.ArtefactoOdontoGate.model.MedicalRecord;
+import com.OdontoGate.ArtefactoOdontoGate.model.Patient;
 import com.OdontoGate.ArtefactoOdontoGate.repository.MedicalRecordRepository;
+import com.OdontoGate.ArtefactoOdontoGate.repository.PatientRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,12 @@ class MedicalRecordServiceTest {
     @Mock
     private MedicalRecordRepository medicalRecordRepository;
 
+    @Mock
+    private PatientRepository patientRepository;
+
+    @Mock
+    private PdfService pdfService;
+
     @InjectMocks
     private MedicalRecordServiceImpl medicalRecordService;
 
@@ -53,6 +61,13 @@ class MedicalRecordServiceTest {
     @Test
     @DisplayName("Crea historia clínica y mapea correctamente todos los campos")
     void cuandoDatosSonValidos_debeMapearYRetornarResponse() {
+        Patient patient = new Patient();
+        patient.setId(PATIENT_ID);
+        patient.setName("Ana");
+        patient.setLastname("Perez");
+        patient.setActive(true);
+
+        when(patientRepository.findById(PATIENT_ID)).thenReturn(Optional.of(patient));
         when(medicalRecordRepository.save(any(MedicalRecord.class)))
                 .thenAnswer(invocation -> {
                     MedicalRecord saved = invocation.getArgument(0);

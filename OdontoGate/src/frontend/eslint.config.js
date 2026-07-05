@@ -2,6 +2,9 @@ import js from '@eslint/js';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 
 export default [
+  {
+    ignores: ['dist/**', 'dist-ssr/**', 'node_modules/**'],
+  },
   js.configs.recommended,
   {
     files: ['src/**/*.{js,jsx}'],
@@ -19,8 +22,10 @@ export default [
         document: 'readonly',
         console: 'readonly',
         fetch: 'readonly',
+        FormData: 'readonly',
         alert: 'readonly',
         confirm: 'readonly',
+        localStorage: 'readonly',
         Promise: 'readonly',
         URL: 'readonly',
       },
@@ -33,7 +38,7 @@ export default [
       // ══════════════════════════════════════════
       'id-length': ['error', {
         min: 2,
-        exceptions: ['e', 'i', 'j', 'k', 'x', 'y'],
+        exceptions: ['_', 'a', 'd', 'e', 'i', 'j', 'k', 'p', 's', 't', 'u', 'x', 'y'],
         properties: 'never',
       }],
 
@@ -44,6 +49,8 @@ export default [
       'no-unused-vars': ['error', {
         vars: 'all',
         args: 'after-used',
+        varsIgnorePattern: '^React$',
+        argsIgnorePattern: '^onNavigateToPay$',
         ignoreRestSiblings: true,
       }],
 

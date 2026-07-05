@@ -62,10 +62,18 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Horario no encontrado"));
 
-        if (request.getWeekday() != null) schedule.setWeekday(request.getWeekday());
-        if (request.getStartTime() != null) schedule.setStartTime(request.getStartTime());
-        if (request.getEndTime() != null) schedule.setEndTime(request.getEndTime());
-        if (request.getIsAvailable() != null) schedule.setIsAvailable(request.getIsAvailable());
+        if (request.getWeekday() != null) {
+            schedule.setWeekday(request.getWeekday());
+        }
+        if (request.getStartTime() != null) {
+            schedule.setStartTime(request.getStartTime());
+        }
+        if (request.getEndTime() != null) {
+            schedule.setEndTime(request.getEndTime());
+        }
+        if (request.getIsAvailable() != null) {
+            schedule.setIsAvailable(request.getIsAvailable());
+        }
 
         LocalTime startFinal = request.getStartTime() != null ? request.getStartTime() : schedule.getStartTime();
         LocalTime endFinal = request.getEndTime() != null ? request.getEndTime() : schedule.getEndTime();

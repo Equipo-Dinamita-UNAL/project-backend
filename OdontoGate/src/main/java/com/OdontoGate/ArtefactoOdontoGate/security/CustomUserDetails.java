@@ -19,7 +19,7 @@ public class CustomUserDetails implements UserDetails {
         this.email = email;
         this.password = password;
         this.enabled = enabled;
-        this.authorities = authorities;
+        this.authorities = List.copyOf(authorities);
     }
 
     public Integer getId() { return id; }
@@ -27,7 +27,7 @@ public class CustomUserDetails implements UserDetails {
     @Override public String getUsername() { return email; }
     @Override public String getPassword() { return password; }
     @Override public boolean isEnabled() { return enabled; }
-    @Override public Collection<? extends GrantedAuthority> getAuthorities() { return authorities; }
+    @Override public Collection<? extends GrantedAuthority> getAuthorities() { return List.copyOf(authorities); }
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }

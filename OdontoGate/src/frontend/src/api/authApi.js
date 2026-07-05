@@ -1,8 +1,7 @@
-/* global localStorage */
 // src/api/authApi.js
 
 const LOGIN_BASE_URL = 'http://localhost:8080/api/login';
-const USER_BASE_URL = 'http://localhost:8080/api/users';
+const REGISTER_BASE_URL = 'http://localhost:8080/api/register';
 
 // 1. Iniciar sesion real
 export const loginUser = async (email, password) => {
@@ -40,17 +39,12 @@ export const loginUser = async (email, password) => {
 // 2. Registrar un nuevo paciente desde el flujo publico
 export const registerPatient = async (patientData) => {
   try {
-    const payload = {
-      ...patientData,
-      userType: 'PATIENT'
-    };
-
-    const response = await fetch(`${USER_BASE_URL}`, {
+    const response = await fetch(`${REGISTER_BASE_URL}/patient`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(patientData)
     });
 
     if (!response.ok) {
@@ -78,7 +72,7 @@ export const changePassword = async (email, oldPassword, newPassword) => {
         'Content-Type': 'application/json',
         'Authorization': token ? `Bearer ${token}` : ''
       },
-      body: JSON.stringify({ email, oldPassword, newPassword })
+      body: JSON.stringify({ oldPassword, newPassword })
     });
 
     if (!response.ok) {

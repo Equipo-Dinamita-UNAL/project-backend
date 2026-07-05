@@ -92,7 +92,26 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     @Override
     public byte[] getMedicalRecordPdfBytes(Integer id) throws Exception {
         MedicalRecordResponse record = this.findById(id);
+        return buildPdf(record);
+    }
 
+    @Override
+    public byte[] getMedicalRecordPdfBytes(
+            Integer id,
+            Integer requestingUserId,
+            boolean patientRequester) throws Exception {
+        MedicalRecordResponse record = this.findById(id);
+
+        if (patientRequester && !record.getPatientId().equals(requestingUserId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "No tienes permiso para acceder a esta historia clinica");
+        }
+
+        return buildPdf(record);
+    }
+
+    private byte[] buildPdf(MedicalRecordResponse record) throws Exception {
         Map<String, Object> data = new HashMap<>();
         data.put("record", record);
 

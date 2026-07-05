@@ -16,7 +16,9 @@ import com.OdontoGate.ArtefactoOdontoGate.repository.DoctorRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.ScheduleRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.TreatmentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -74,6 +76,13 @@ public class AppointmentService {
         return toResponse(saved);
     }
 
+    public AppointmentResponse create(AppointmentRequest request,
+                                      Integer requestingUserId,
+                                      boolean patientRequester) {
+        validateRequestedPatient(request.getPatientId(), requestingUserId, patientRequester);
+        return create(request);
+    }
+
     public List<AppointmentResponse> getAll() {
         return appointmentRepository.findAll()
                 .stream()
@@ -88,6 +97,13 @@ public class AppointmentService {
                 .toList();
     }
 
+    public List<AppointmentResponse> getByPatient(Integer patientId,
+                                                  Integer requestingUserId,
+                                                  boolean patientRequester) {
+        validateRequestedPatient(patientId, requestingUserId, patientRequester);
+        return getByPatient(patientId);
+    }
+
     public List<AppointmentResponse> getByDoctor(Integer doctorId) {
         return appointmentRepository.findByDoctorId(doctorId)
                 .stream()
@@ -95,7 +111,23 @@ public class AppointmentService {
                 .toList();
     }
 
+    public List<AppointmentResponse> getByDoctor(Integer doctorId,
+                                                 Integer requestingUserId,
+                                                 boolean doctorRequester) {
+        if (doctorRequester && !requestingUserId.equals(doctorId)) {
+            throwForbidden();
+        }
+        return getByDoctor(doctorId);
+    }
+
     public void delete(Integer id) {
+        appointmentRepository.deleteById(id);
+    }
+
+    public void delete(Integer id, Integer requestingUserId, boolean patientRequester) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+        validateAppointmentOwner(appointment, requestingUserId, patientRequester);
         appointmentRepository.deleteById(id);
     }
 
@@ -103,9 +135,32 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
-        if (request.getDate() != null) appointment.setDate(request.getDate());
-        if (request.getTime() != null) appointment.setTime(request.getTime());
-        if (request.getReason() != null) appointment.setReason(request.getReason());
+        return updateAppointment(id, request, appointment);
+    }
+
+    public AppointmentResponse update(Integer id,
+                                      AppointmentUpdateRequest request,
+                                      Integer requestingUserId,
+                                      boolean patientRequester) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+        validateAppointmentOwner(appointment, requestingUserId, patientRequester);
+        return updateAppointment(id, request, appointment);
+    }
+
+    private AppointmentResponse updateAppointment(
+            Integer id,
+            AppointmentUpdateRequest request,
+            Appointment appointment) {
+        if (request.getDate() != null) {
+            appointment.setDate(request.getDate());
+        }
+        if (request.getTime() != null) {
+            appointment.setTime(request.getTime());
+        }
+        if (request.getReason() != null) {
+            appointment.setReason(request.getReason());
+        }
 
         if (request.getDoctorScheduleId() != null) {
             Schedule newSchedule = scheduleRepository.findById(request.getDoctorScheduleId())
@@ -142,6 +197,43 @@ public class AppointmentService {
         Appointment saved = appointmentRepository.findById(appointment.getId())
                 .orElseThrow(() -> new RuntimeException("Error al cancelar la cita"));
         return toResponse(saved);
+    }
+
+    public AppointmentResponse cancel(Integer id, Integer requestingUserId, boolean patientRequester) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+        validateAppointmentOwner(appointment, requestingUserId, patientRequester);
+
+        appointment.setStatus("cancelada");
+        appointmentRepository.save(appointment);
+
+        Appointment saved = appointmentRepository.findById(appointment.getId())
+                .orElseThrow(() -> new RuntimeException("Error al cancelar la cita"));
+        return toResponse(saved);
+    }
+
+    private void validateRequestedPatient(
+            Integer patientId,
+            Integer requestingUserId,
+            boolean patientRequester) {
+        if (patientRequester && !requestingUserId.equals(patientId)) {
+            throwForbidden();
+        }
+    }
+
+    private void validateAppointmentOwner(
+            Appointment appointment,
+            Integer requestingUserId,
+            boolean patientRequester) {
+        if (patientRequester && !appointment.getPatient().getId().equals(requestingUserId)) {
+            throwForbidden();
+        }
+    }
+
+    private void throwForbidden() {
+        throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "No tienes permiso para acceder a esta cita");
     }
 
     private void validarCita(LocalDate date, LocalTime time, Integer doctorId,
@@ -187,7 +279,9 @@ public class AppointmentService {
     }
 
     private Double calculatePriceByReason(String reason) {
-        if (reason == null) return 70000.00;
+        if (reason == null) {
+            return 70000.00;
+        }
         return treatmentRepository.findByName(reason.trim())
                 .map(Treatment::getPrice)
                 .orElse(70000.00);

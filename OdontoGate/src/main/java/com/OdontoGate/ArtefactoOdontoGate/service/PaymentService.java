@@ -18,8 +18,10 @@ import com.OdontoGate.ArtefactoOdontoGate.repository.TreatmentRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -54,6 +56,31 @@ public class PaymentService {
                 savedPayment.getId().toString(),
                 amount,
                 "Cita odontológica"
+        );
+
+        PaymentResponse response = mapToResponse(savedPayment);
+        response.setCheckoutUrl(checkoutUrl);
+        return response;
+    }
+
+    @Transactional
+    public PaymentResponse createVirtualPayment(
+            PaymentRequest request,
+            Integer requestingUserId,
+            boolean patientRequester) {
+
+        Appointment appointment = findAppointmentOrThrow(request.getAppointmentId());
+        validateAppointmentOwner(appointment, requestingUserId, patientRequester);
+        validateNoExistingPayment(request.getAppointmentId());
+        BigDecimal amount = calculateCorrectAmount(appointment, request.getAmount());
+
+        Payment payment = buildPayment(appointment, amount, "MERCADO_PAGO", STATUS_PENDIENTE);
+        Payment savedPayment = paymentRepository.save(payment);
+
+        String checkoutUrl = paymentGateway.generateCheckoutUrl(
+                savedPayment.getId().toString(),
+                amount,
+                "Cita odontolÃ³gica"
         );
 
         PaymentResponse response = mapToResponse(savedPayment);
@@ -215,6 +242,16 @@ public class PaymentService {
         return mapToResponse(payment);
     }
 
+    public PaymentResponse getPaymentByAppointment(
+            Integer appointmentId,
+            Integer requestingUserId,
+            boolean patientRequester) {
+        Payment payment = paymentRepository.findByAppointmentId(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Pago no encontrado para esta cita"));
+        validatePaymentOwner(payment, requestingUserId, patientRequester);
+        return mapToResponse(payment);
+    }
+
     public List<PaymentResponse> getAllPayments() {
         return paymentRepository.findAll()
                 .stream()
@@ -225,6 +262,16 @@ public class PaymentService {
     public PaymentResponse getPaymentById(Integer id) {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
+        return mapToResponse(payment);
+    }
+
+    public PaymentResponse getPaymentById(
+            Integer id,
+            Integer requestingUserId,
+            boolean patientRequester) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
+        validatePaymentOwner(payment, requestingUserId, patientRequester);
         return mapToResponse(payment);
     }
 
@@ -254,6 +301,52 @@ public class PaymentService {
         PaymentResponse response = mapToResponse(payment);
         response.setCheckoutUrl(checkoutUrl);
         return response;
+    }
+
+    @Transactional
+    public PaymentResponse retryPayment(
+            Integer id,
+            Integer requestingUserId,
+            boolean patientRequester) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
+        validatePaymentOwner(payment, requestingUserId, patientRequester);
+
+        if (!"PENDIENTE".equals(payment.getStatus())) {
+            throw new RuntimeException("Solo se pueden reintentar pagos en estado PENDIENTE");
+        }
+
+        String checkoutUrl = paymentGateway.generateCheckoutUrl(
+                payment.getId().toString(),
+                payment.getAmount(),
+                "Cita odontolÃ³gica"
+        );
+
+        PaymentResponse response = mapToResponse(payment);
+        response.setCheckoutUrl(checkoutUrl);
+        return response;
+    }
+
+    private void validateAppointmentOwner(
+            Appointment appointment,
+            Integer requestingUserId,
+            boolean patientRequester) {
+        if (patientRequester && !appointment.getPatient().getId().equals(requestingUserId)) {
+            throwForbidden();
+        }
+    }
+
+    private void validatePaymentOwner(
+            Payment payment,
+            Integer requestingUserId,
+            boolean patientRequester) {
+        validateAppointmentOwner(payment.getAppointment(), requestingUserId, patientRequester);
+    }
+
+    private void throwForbidden() {
+        throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "No tienes permiso para acceder a este pago");
     }
 
     private PaymentResponse mapToResponse(Payment payment) {

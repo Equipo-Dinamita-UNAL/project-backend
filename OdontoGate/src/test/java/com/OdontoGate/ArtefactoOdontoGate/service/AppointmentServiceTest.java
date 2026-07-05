@@ -1,11 +1,15 @@
 package com.OdontoGate.ArtefactoOdontoGate.service;
 
 import com.OdontoGate.ArtefactoOdontoGate.dto.request.AppointmentRequest;
-import com.OdontoGate.ArtefactoOdontoGate.model.*;
+import com.OdontoGate.ArtefactoOdontoGate.model.Appointment;
+import com.OdontoGate.ArtefactoOdontoGate.model.Doctor;
+import com.OdontoGate.ArtefactoOdontoGate.model.Patient;
+import com.OdontoGate.ArtefactoOdontoGate.model.Schedule;
 import com.OdontoGate.ArtefactoOdontoGate.repository.AppointmentRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.DoctorRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.PatientRepository;
 import com.OdontoGate.ArtefactoOdontoGate.repository.ScheduleRepository;
+import com.OdontoGate.ArtefactoOdontoGate.repository.TreatmentRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,6 +39,9 @@ class AppointmentServiceTest {
     @Mock
     private ScheduleRepository scheduleRepository;
 
+    @Mock
+    private TreatmentRepository treatmentRepository;
+
     @InjectMocks
     private AppointmentService appointmentService;
 
@@ -54,6 +61,7 @@ class AppointmentServiceTest {
 
         Patient patient = new Patient();
         patient.setId(1);
+        patient.setActive(true);
 
         Doctor doctor = new Doctor();
         doctor.setId(1);
@@ -88,6 +96,7 @@ class AppointmentServiceTest {
 
         Patient patient = new Patient();
         patient.setId(1);
+        patient.setActive(true);
 
         Doctor doctor = new Doctor();
         doctor.setId(1);
@@ -95,6 +104,9 @@ class AppointmentServiceTest {
         Schedule schedule = new Schedule();
         schedule.setId(1);
         schedule.setIsAvailable(true);
+        schedule.setWeekday(request.getDate().getDayOfWeek().name());
+        schedule.setStartTime(LocalTime.of(8, 0));
+        schedule.setEndTime(LocalTime.of(10, 0));
 
         // Cita existente con el mismo doctor, fecha y hora
         Appointment citaExistente = new Appointment();
@@ -128,12 +140,18 @@ class AppointmentServiceTest {
 
         Patient patient = new Patient();
         patient.setId(1);
+        patient.setActive(true);
 
         Doctor doctor = new Doctor();
         doctor.setId(1);
 
+        Schedule schedule = new Schedule();
+        schedule.setId(1);
+        schedule.setIsAvailable(true);
+
         when(patientRepository.findById(1)).thenReturn(Optional.of(patient));
         when(doctorRepository.findById(1)).thenReturn(Optional.of(doctor));
+        when(scheduleRepository.findById(1)).thenReturn(Optional.of(schedule));
 
         RuntimeException ex = assertThrows(RuntimeException.class,
                 () -> appointmentService.create(request));

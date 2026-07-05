@@ -5,6 +5,7 @@ import com.OdontoGate.ArtefactoOdontoGate.dto.Login.requests.LoginRequest;
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses.ChangePasswordResponse;
 import com.OdontoGate.ArtefactoOdontoGate.dto.Login.responses.LoginResponse;
 
+import com.OdontoGate.ArtefactoOdontoGate.service.CurrentUserService;
 import com.OdontoGate.ArtefactoOdontoGate.service.LoginService;
 
 
@@ -22,9 +23,12 @@ import org.springframework.http.HttpStatus;
 public class LoginController {
 
     private final LoginService loginService;
+    private final CurrentUserService currentUserService;
 
-        public LoginController(LoginService loginService){
+        public LoginController(LoginService loginService,
+                               CurrentUserService currentUserService){
         this.loginService = loginService;
+        this.currentUserService = currentUserService;
     }
 
         @PostMapping
@@ -40,7 +44,9 @@ public class LoginController {
     public ResponseEntity<ChangePasswordResponse> changePassword(
             @Valid @RequestBody ChangePasswordRequest request) {
 
-        ChangePasswordResponse response = loginService.changePassword(request);
+        ChangePasswordResponse response = loginService.changePassword(
+                request,
+                currentUserService.getCurrentUserId());
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
@@ -42,6 +43,16 @@ public class GlobalExceptionHandler {
         Map<String, String> error = new HashMap<>();
         error.put(ERROR_KEY, "Error interno del servidor");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
+        @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, Object>> handleResponseStatusException(
+            ResponseStatusException ex) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("timestamp", LocalDateTime.now());
+        error.put("status", ex.getStatusCode().value());
+        error.put("descripcion", ex.getReason());
+        return ResponseEntity.status(ex.getStatusCode()).body(error);
     }
 
         @ExceptionHandler(RuntimeException.class)
