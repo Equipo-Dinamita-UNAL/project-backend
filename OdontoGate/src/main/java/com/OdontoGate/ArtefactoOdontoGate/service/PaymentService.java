@@ -175,9 +175,13 @@ public class PaymentService {
             return null;
         }
 
-        // Formato 1: {"resource": "164578842435", "topic": "payment"}
+
         if ("payment".equals(topic) && body.get("resource") != null) {
-            return String.valueOf(body.get("resource"));
+            String resource = String.valueOf(body.get("resource"));
+            if (resource.contains("/")) {
+                resource = resource.substring(resource.lastIndexOf('/') + 1);
+            }
+            return resource;
         }
 
         // Formato 2: {"data": {"id": 164578842435}, "type": "payment"}
